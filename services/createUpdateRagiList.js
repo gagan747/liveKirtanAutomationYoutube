@@ -118,11 +118,14 @@ function removeDateEntriesFromString(inputString) {
 }
 
 const generateTimingsArrayFromString = (str) => {
-  const regexToDetectTimeInFormat_HH_MM = /(\d{1,2}-\d{2}).*?to.*?((\d{1,2}-\d{2})|till Completion)/gm;   //ye regex tbhi bhi same result deta agr \d{2}-\d{2} isko () m wrap na krte ,wrap krne se ye hoga ki jo niche regex.exec chalaya h wo matched result m agr () wali entries h to use apne result roopi array m position 1 for first occurence of () and position second for second occurence of () and so on.. jisse mera logic optimize hora tha ,or dusre tareke h but ye optimized laga isliye  kiya  use
+  const regexToDetectTimeInFormat_HH_MM = /(\d{1,2}-\d{2}).*?to.*?((\d{1,2}-\d{2}(?:.*?Morning)?)|till Completion)/gm;   //ye regex tbhi bhi same result deta agr \d{2}-\d{2} isko () m wrap na krte ,wrap krne se ye hoga ki jo niche regex.exec chalaya h wo matched result m agr () wali entries h to use apne result roopi array m position 1 for first occurence of () and position second for second occurence of () and so on.. jisse mera logic optimize hora tha ,or dusre tareke h but ye optimized laga isliye  kiya  use
   const timingsArray = [];
   let match;
   while (match = regexToDetectTimeInFormat_HH_MM.exec(str)) {     //regex.match hota h jo sare timingsArray array m return krta h pr exec kya krta h jb chlta h to single match return krta h agr dubara chalaenge to uske age se match krega jo already match ho chuka tha usko skip krke 
-    timingsArray.push(`${match[1]} to ${match[2]}`);
+    timingsArray.push(
+      match[2].includes('Morning')
+        ? `${match[1]} to ${match[2]}`.replace(/(\s+|Morning)/g, '')
+        : `${parseInt(match[1].split('-')[0]) === 12 ? 12 : parseInt(match[1].split('-')[0]) + 12}-${match[1].split('-')[1]} to ${match[2].includes('till Completion') ? 'till Completion' : `${parseInt(match[2].split('-')[0]) === 12 ? 12 : parseInt(match[2].split('-')[0]) + 12}-${match[2].split('-')[1]}`}`);
   }
   return timingsArray
 }
