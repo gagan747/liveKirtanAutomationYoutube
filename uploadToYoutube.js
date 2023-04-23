@@ -137,7 +137,7 @@ let uploadVideo = function (auth) {
         },
         // I set to private for tests
         status: {
-          privacyStatus: 'public'
+          privacyStatus: 'private'
         }
       },
 
