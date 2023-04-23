@@ -4,7 +4,7 @@ import express from 'express';
 import cron from 'node-cron';
 import ffmpeg from 'fluent-ffmpeg';
 import fs from 'fs';
-import { uploadToYoutube } from './uploadToYoutube.js';
+// import { uploadToYoutube } from './uploadToYoutube.js';
 import { path as ffmpegPath } from '@ffmpeg-installer/ffmpeg';
 ffmpeg.setFfmpegPath(ffmpegPath);
 let cronSchedulers = [];
@@ -117,8 +117,7 @@ const initializeSchedulers = (schedulers) => {
   })
   console.log('schedulers initialized successfully')
 };
-
-recordStream('Waheguru', 10000)
+//recordStream('Waheguru', 10000)
 //uploadToYoutube()
 //initializeSchedulers(generateConfigForCronUsingRagiList(ragiList))
 //ragiListUpdateScheduler()

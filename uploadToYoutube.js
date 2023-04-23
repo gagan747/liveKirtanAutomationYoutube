@@ -1,8 +1,13 @@
 import fs from 'fs';
 import readline from 'readline';
 import { google } from 'googleapis';
+import dotenv from 'dotenv';
+dotenv.config();
 const service = google.youtube('v3');
 var OAuth2 = google.auth.OAuth2;
+var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
+  process.env.USERPROFILE) + '/.credentials/';
+var TOKEN_PATH = TOKEN_DIR + `youtube-nodejs-quickstart.json`;
 
 // If modifying these scopes, delete your previously saved credentials
 // at ~/.credentials/youtube-nodejs-quickstart.json
@@ -10,22 +15,23 @@ const SCOPES = [
   'https://www.googleapis.com/auth/youtube.upload',
   'https://www.googleapis.com/auth/youtube.readonly'
 ];
-var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
-  process.env.USERPROFILE) + '/.credentials/';
-var TOKEN_PATH = TOKEN_DIR + 'youtube-nodejs-quickstart.json';
+
 
 // Load client secrets from a local file.
 export const uploadToYoutube = (outputPath) => {
-
-  fs.readFile('client_secret.json', function processClientSecrets(err, content) {
-    if (err) {
-      console.log('Error loading client secret file: ' + err);
-      return;
+   const current = JSON.parse(fs.readFileSync('./trackCurrentProjectCredentials.json', 'UTF-8')).current;
+  const content = {
+    web: {
+      client_secret: process.env[`client_secret${current}`],
+      client_id: process.env[`client_id${current}`],
+      redirect_uris: [process.env[`redirect_uri${current}`]]
     }
-    uploadVideo = uploadVideo.bind({ outputPath })
-    // Authorize a client with the loaded credentials, then call the YouTube API.
-    authorize(JSON.parse(content), uploadVideo);
-  });
+  }
+  uploadVideo = uploadVideo.bind({ outputPath })
+  authorize(content, uploadVideo);
+
+  // Authorize a client with the loaded credentials, then call the YouTube API.
+ 
 }
 
 /**
@@ -41,15 +47,15 @@ function authorize(credentials, callback) {
   var redirectUrl = credentials.web.redirect_uris[0];
   var oauth2Client = new OAuth2(clientId, clientSecret, redirectUrl);
 
+
   // Check if we have previously stored a token.
-  fs.readFile(TOKEN_PATH, function (err, token) {
-    if (err) {
-      getNewToken(oauth2Client, callback);
-    } else {
-      oauth2Client.credentials = JSON.parse(token);
-      callback(oauth2Client);
-    }
-  });
+  if (!process.env[`token_for_project${JSON.parse(fs.readFileSync('./trackCurrentProjectCredentials.json', 'UTF-8')).current}`]) {
+    getNewToken(oauth2Client, callback);
+  } else {
+    oauth2Client.credentials = JSON.parse(process.env[`token_for_project${JSON.parse(fs.readFileSync('./trackCurrentProjectCredentials.json', 'UTF-8')).current}`]);
+    callback(oauth2Client);
+  }
+
 }
 
 /**
@@ -77,9 +83,10 @@ function getNewToken(oauth2Client, callback) {
         console.log('Error while trying to retrieve access token', err);
         return;
       }
+      console.log('yok',token)
       oauth2Client.credentials = token;
       storeToken(token);
-      callback(oauth2Client);
+      // callback(oauth2Client); // i have commented such that if there is no token ,token generate process is started and stops after generating token instead of then continue to upload bcoz i have changed logic and according to that first i have to copy paste token from the token path to env first then it can upload ,i.e, i have commented
     });
   });
 }
@@ -150,3 +157,4 @@ let uploadVideo = function (auth) {
     }
   );
 };
+uploadToYoutube('./ghi.mp4')
