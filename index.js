@@ -4,7 +4,7 @@ import express from 'express';
 import cron from 'node-cron';
 import ffmpeg from 'fluent-ffmpeg';
 import fs from 'fs';
-// import { uploadToYoutube } from './uploadToYoutube.js';
+import { uploadToYoutube } from './uploadToYoutube.js';
 import { path as ffmpegPath } from '@ffmpeg-installer/ffmpeg';
 ffmpeg.setFfmpegPath(ffmpegPath);
 let cronSchedulers = [];
@@ -46,10 +46,10 @@ const recordStream = (duty, endMilliseconds, to) => {
   var fullYear = currentIndianDate.getFullYear()
   var datetime = date + "-"//for creating unique filename
     + month + "-"
-    + fullYear + "@"
+    + fullYear + " ("
     + currentIndianDate.getHours() + ":"
     + currentIndianDate.getMinutes() + ":"
-    + currentIndianDate.getSeconds();
+    + currentIndianDate.getSeconds() + ")"
   //const formattedDate = `${date.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${fullYear.toString()}`;
   console.log('recording started at', datetime)
   const fileName = `${duty.trim()} Darbar Sahib Kirtan Duty ${datetime} - ${to}`;
@@ -58,7 +58,7 @@ const recordStream = (duty, endMilliseconds, to) => {
   const imgMorPath = './darbarSahibDay.gif';
   const imgNigPath = './darbarSahibNight.gif'
   const command = ffmpeg()
-  command.input((getIndianDate().getHours() >= 18 && getIndianDate().getHours() <=5 )?imgNigPath:imgMorPath)
+  command.input((getIndianDate().getHours() >= 18 || getIndianDate().getHours() <= 5) ? imgNigPath : imgMorPath)
     .inputOptions(['-ignore_loop', '0'])// if want a img instead of gif replace this inputOPtions with loop()
     .input(liveGurbaniStream) //it goes to event loop and when the on('data') event fires it converts to video and writes to output path and the process continues until we manually stop input stream  
     .audioCodec('aac')
@@ -71,11 +71,11 @@ const recordStream = (duty, endMilliseconds, to) => {
       setTimeout(() => {
         try {
           console.log('upload to youtube started for', outputPath)
-         // uploadToYoutube(outputPath)
+          uploadToYoutube(outputPath)
         } catch (err) {
           console.log(err)
         }
-      }, 59000);
+      }, 5900);
     })
     .on('error', (err) => console.log('An error occurred: ' + err.message))
     .run();
@@ -117,7 +117,7 @@ const initializeSchedulers = (schedulers) => {
   })
   console.log('schedulers initialized successfully')
 };
-//recordStream('Waheguru', 10000)
+recordStream('Night Duty', 40000, '2:20')
 //uploadToYoutube()
 //initializeSchedulers(generateConfigForCronUsingRagiList(ragiList))
 //ragiListUpdateScheduler()

@@ -19,7 +19,18 @@ const SCOPES = [
 
 // Load client secrets from a local file.
 export const uploadToYoutube = (outputPath) => {
-   const current = JSON.parse(fs.readFileSync('./trackCurrentProjectCredentials.json', 'UTF-8')).current;
+  let { current, perProjectQuota } = JSON.parse(fs.readFileSync('./trackCurrentProjectCredentials.json', 'UTF-8'));
+  perProjectQuota += 1;
+  if (perProjectQuota === 7) {
+    current += 1;
+    perProjectQuota = 0;
+    if (current === 4)
+      current = 1
+  }
+  fs.writeFileSync('./trackCurrentProjectCredentials.json', JSON.stringify({
+    current,
+    perProjectQuota
+  }))
   const content = {
     web: {
       client_secret: process.env[`client_secret${current}`],
@@ -31,7 +42,7 @@ export const uploadToYoutube = (outputPath) => {
   authorize(content, uploadVideo);
 
   // Authorize a client with the loaded credentials, then call the YouTube API.
- 
+
 }
 
 /**
@@ -46,8 +57,6 @@ function authorize(credentials, callback) {
   var clientId = credentials.web.client_id;
   var redirectUrl = credentials.web.redirect_uris[0];
   var oauth2Client = new OAuth2(clientId, clientSecret, redirectUrl);
-
-
   // Check if we have previously stored a token.
   if (!process.env[`token_for_project${JSON.parse(fs.readFileSync('./trackCurrentProjectCredentials.json', 'UTF-8')).current}`]) {
     getNewToken(oauth2Client, callback);
@@ -83,7 +92,6 @@ function getNewToken(oauth2Client, callback) {
         console.log('Error while trying to retrieve access token', err);
         return;
       }
-      console.log('yok',token)
       oauth2Client.credentials = token;
       storeToken(token);
       // callback(oauth2Client); // i have commented such that if there is no token ,token generate process is started and stops after generating token instead of then continue to upload bcoz i have changed logic and according to that first i have to copy paste token from the token path to env first then it can upload ,i.e, i have commented
@@ -157,4 +165,3 @@ let uploadVideo = function (auth) {
     }
   );
 };
-uploadToYoutube('./ghi.mp4')
