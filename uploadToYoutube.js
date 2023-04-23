@@ -16,6 +16,7 @@ var TOKEN_PATH = TOKEN_DIR + 'youtube-nodejs-quickstart.json';
 
 // Load client secrets from a local file.
 export const uploadToYoutube = (outputPath) => {
+
   fs.readFile('client_secret.json', function processClientSecrets(err, content) {
     if (err) {
       console.log('Error loading client secret file: ' + err);
@@ -116,12 +117,12 @@ let uploadVideo = function (auth) {
       resource: {
         // Video title and description
         snippet: {
-          title: 'Live kirtan hhlhjhjl',
-          description: 'video about live kirtan'
+          title: outputPath.substring(2).replace(/\.mp4$/, ""),
+          description: ''
         },
         // I set to private for tests
         status: {
-          privacyStatus: 'private'
+          privacyStatus: 'public'
         }
       },
 
@@ -133,20 +134,19 @@ let uploadVideo = function (auth) {
     (error, data) => {
       if (error) {
         console.log(error);
-        // fs.unlink(outputPath, function (err) {
-        //   if (err) throw err;
-        //   // if no error, file has been deleted successfully
-        //   console.log(outputPath.substring(2) + 'deleted!');
-        // });
+        fs.unlink(outputPath, function (err) {
+          if (err) throw err;
+          // if no error, file has been deleted successfully
+          console.log(outputPath.substring(2) + 'deleted!');
+        });
         return
       }
       console.log('uploaded')
-      // fs.unlink(outputPath, function (err) {
-      //   if (err) throw err;
-      //   // if no error, file has been deleted successfully
-      //   console.log(outputPath.substring(2) + 'deleted!');
-      // });
+      fs.unlink(outputPath, function (err) {
+        if (err) throw err;
+        // if no error, file has been deleted successfully
+        console.log(outputPath.substring(2) + 'deleted!');
+      });
     }
   );
 };
-uploadToYoutube('./video.mp4')
