@@ -1,6 +1,8 @@
 import { createUpdateRagiList } from "./services/createUpdateRagiList.js";
 import got from 'got';
 import express from 'express';
+import dotenv from 'dotenv';
+dotenv.config();
 import cron from 'node-cron';
 import ffmpeg from 'fluent-ffmpeg';
 import fs from 'fs';
@@ -11,7 +13,10 @@ let cronSchedulers = [];
 const ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
 const app = express();
 
+
 const getIndianDate = () => new Date(new Date().toLocaleString(undefined, { timeZone: 'Asia/Kolkata' }));
+
+console.log(process.env.client_id1)
 
 const ragiListUpdateScheduler = async () => {
   try {
@@ -49,16 +54,16 @@ const recordStream = (duty, endMilliseconds, to) => {
     + fullYear + " ("
     + currentIndianDate.getHours() + ":"
     + currentIndianDate.getMinutes() + ":"
-    + currentIndianDate.getSeconds() + ")"
+    + currentIndianDate.getSeconds();
   //const formattedDate = `${date.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${fullYear.toString()}`;
-  console.log('recording started at', datetime)
-  const fileName = `${duty.trim()} Darbar Sahib Kirtan Duty ${datetime} - ${to}`;
+  console.log('recording started at', datetime, ')')
+  const fileName = `${duty.trim()} Darbar Sahib Kirtan Duty ${datetime} - ${to})`;
   const liveGurbaniStream = got.stream(liveStreamSgpcUrl) // a readable stream 
   const outputPath = `./${fileName}.mp4`;
   const imgMorPath = './darbarSahibDay.gif';
   const imgNigPath = './darbarSahibNight.gif'
   const command = ffmpeg()
-  command.input((getIndianDate().getHours() >= 18 || getIndianDate().getHours() <= 5) ? imgNigPath : imgMorPath)
+  command.input((getIndianDate().getHours() >= 19 || getIndianDate().getHours() <= 5) ? imgNigPath : imgMorPath)
     .inputOptions(['-ignore_loop', '0'])// if want a img instead of gif replace this inputOPtions with loop()
     .input(liveGurbaniStream) //it goes to event loop and when the on('data') event fires it converts to video and writes to output path and the process continues until we manually stop input stream  
     .audioCodec('aac')
@@ -75,7 +80,7 @@ const recordStream = (duty, endMilliseconds, to) => {
         } catch (err) {
           console.log(err)
         }
-      }, 5900);
+      }, 59000);
     })
     .on('error', (err) => console.log('An error occurred: ' + err.message))
     .run();
@@ -108,7 +113,12 @@ const initializeSchedulers = (schedulers) => {
   cronSchedulers = [];
   schedulers.map((schedule) => {
     const scheduler = cron.schedule(schedule.config, () => {
-      const endMilliseconds = ((parseInt(schedule.to.split('-')[0]) - parseInt(schedule.from.split('-')[0])) + (parseInt(schedule.to.split('-')[1]) - parseInt(schedule.from.split('-')[1])) / 60) * 60 * 60 * 1000;
+      let endMilliseconds;
+      console.log(schedule.to)
+      if (schedule.to.trim().toLowerCase() === 'till completion')
+        endMilliseconds = 1000 * 60 * 60;
+      else
+        endMilliseconds = ((parseInt(schedule.to.split('-')[0]) - parseInt(schedule.from.split('-')[0])) + (parseInt(schedule.to.split('-')[1]) - parseInt(schedule.from.split('-')[1])) / 60) * 60 * 60 * 1000;
       recordStream(schedule.duty, endMilliseconds, schedule.to)
     }, {
       timezone: 'Asia/Kolkata'
@@ -117,7 +127,28 @@ const initializeSchedulers = (schedulers) => {
   })
   console.log('schedulers initialized successfully')
 };
-recordStream('Night Duty', 40000, '2:20')
-//uploadToYoutube()
-//initializeSchedulers(generateConfigForCronUsingRagiList(ragiList))
-//ragiListUpdateScheduler()
+
+
+ragiListUpdateScheduler()
+
+cron.schedule('20 1,17,10 1,2,3,14,15,16,17 * *', () => { //schedule ragiListUpdate
+  ragiListUpdateScheduler()
+}, {
+  timezone: 'Asia/Kolkata'
+})
+
+function deleteMp4FilesIfAnyLeft() {
+  const files = fs.readdirSync('.');
+  files.forEach((file) => {
+    if (file.endsWith('.mp4')) {
+      fs.unlinkSync(file);
+      console.log(`Deleted file: ${file} through scheduled node-cron-service`);
+    }
+  });
+}
+
+cron.schedule('20 1 * * *', () => { //scheduled mp4 deleter if any file is left undeleted by any bug
+deleteMp4FilesIfAnyLeft()
+}, {
+  timezone: 'Asia/Kolkata'
+})

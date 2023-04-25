@@ -38,8 +38,8 @@ export const uploadToYoutube = (outputPath) => {
       redirect_uris: [process.env[`redirect_uri${current}`]]
     }
   }
-  uploadVideo = uploadVideo.bind({ outputPath })
-  authorize(content, uploadVideo);
+  let upload = uploadVideo.bind({ outputPath })
+  authorize(content, upload);
 
   // Authorize a client with the loaded credentials, then call the YouTube API.
 
@@ -64,7 +64,6 @@ function authorize(credentials, callback) {
     oauth2Client.credentials = JSON.parse(process.env[`token_for_project${JSON.parse(fs.readFileSync('./trackCurrentProjectCredentials.json', 'UTF-8')).current}`]);
     callback(oauth2Client);
   }
-
 }
 
 /**
@@ -85,7 +84,7 @@ function getNewToken(oauth2Client, callback) {
     input: process.stdin,
     output: process.stdout
   });
-  rl.question('Enter the code from that page here: ', function (code) {
+  rl.question('Enter the code from that page here:', function (code) {
     rl.close();
     oauth2Client.getToken(code, function (err, token) {
       if (err) {
