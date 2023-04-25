@@ -21,8 +21,6 @@ setInterval(function () {//for preventing render to become unidle
 
 const getIndianDate = () => new Date(new Date().toLocaleString(undefined, { timeZone: 'Asia/Kolkata' }));
 
-console.log(process.env.client_id1, process.env.token_for_project3)
-
 const ragiListUpdateScheduler = async () => {
   try {
     await createUpdateRagiList()
