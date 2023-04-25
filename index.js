@@ -93,6 +93,7 @@ const recordStream = (duty, endMilliseconds, to) => {
   }, endMilliseconds)
 }
 app.get('/', (req, res) => {
+  console.log('hitted')
   res.send(ragiList)
 })
 
