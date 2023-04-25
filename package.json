@@ -4,6 +4,9 @@
   "description": "",
   "type": "module",
   "main": "app.js",
+  "engines": {
+    "node": "16.19.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index"
