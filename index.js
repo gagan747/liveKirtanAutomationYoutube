@@ -33,16 +33,22 @@ const ragiListUpdateScheduler = async () => {
 }
 
 const generateConfigForCronUsingRagiList = (ragiList) => {
-  const configList = Object.keys(ragiList).reduce((p, d) => {
-    return [...p, ...ragiList[d].map((dutyConfig) => ({
-      config: `${dutyConfig.from.trim().split('-')[1]} ${dutyConfig.from.trim().split('-')[0]} ${d.split('/')[0]} ${d.split('/')[1]} *`,
+  var currentIndianDate = getIndianDate();
+  var date = currentIndianDate.getDate();
+  var month = currentIndianDate.getMonth() + 1;
+  var fullYear = currentIndianDate.getFullYear();
+  const formattedDate = `${date.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${fullYear.toString()}`;
+  if (Object.keys(ragiList).indexOf(formattedDate) !== -1) {
+    return ragiList[formattedDate].map((dutyConfig) => ({
+      config: `${dutyConfig.from.trim().split('-')[1]} ${dutyConfig.from.trim().split('-')[0]} ${formattedDate.split('/')[0]} ${formattedDate.split('/')[1]} *`,
       duty: dutyConfig.duty,
       to: dutyConfig.to.trim(),
       from: dutyConfig.from.trim()
     })
-    )]
-  }, [])
-  return configList;
+    )
+  }
+  else
+    return []
 }
 
 const recordStream = (duty, endMilliseconds, to) => {
@@ -135,7 +141,7 @@ const initializeSchedulers = (schedulers) => {
 
 ragiListUpdateScheduler()
 
-cron.schedule('20 1,17,10 1,2,3,14,15,16,17 * *', () => { //schedule ragiListUpdate
+cron.schedule('10,11,12,13 1 * * *', () => { //schedule ragiListUpdate
   ragiListUpdateScheduler()
 }, {
   timezone: 'Asia/Kolkata'
@@ -152,7 +158,7 @@ function deleteMp4FilesIfAnyLeft() {
 }
 
 cron.schedule('20 1 * * *', () => { //scheduled mp4 deleter if any file is left undeleted by any bug
-deleteMp4FilesIfAnyLeft()
+  deleteMp4FilesIfAnyLeft()
 }, {
   timezone: 'Asia/Kolkata'
 })
