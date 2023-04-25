@@ -2,6 +2,7 @@ import { createUpdateRagiList } from "./services/createUpdateRagiList.js";
 import got from 'got';
 import express from 'express';
 import dotenv from 'dotenv';
+import https from 'https'
 dotenv.config();
 import cron from 'node-cron';
 import ffmpeg from 'fluent-ffmpeg';
@@ -13,6 +14,10 @@ let cronSchedulers = [];
 const ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
 const app = express();
 
+
+setInterval(function () {//for preventing render to become unidle
+  https.get("https://livekirtandarbarsahibrecordingautomation.onrender.com/");
+}, 300000);
 
 const getIndianDate = () => new Date(new Date().toLocaleString(undefined, { timeZone: 'Asia/Kolkata' }));
 
