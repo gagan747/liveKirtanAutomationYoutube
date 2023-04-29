@@ -10,10 +10,8 @@ import fs from 'fs';
 import { uploadToYoutube } from './uploadToYoutube.js';
 import { path as ffmpegPath } from '@ffmpeg-installer/ffmpeg';
 ffmpeg.setFfmpegPath(ffmpegPath);
-let cronSchedulers = [];
-const ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
 const app = express();
-
+const delayByRagis = 120000; 
 
 setInterval(function () {//for preventing render to become unidle
   https.get("https://livekirtandarbarsahibrecordingautomation.onrender.com/");
@@ -25,30 +23,10 @@ const ragiListUpdateScheduler = async () => {
   try {
     await createUpdateRagiList()
     console.log('ragi list updated sussessfully ')
-    initializeSchedulers(generateConfigForCronUsingRagiList(JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'))))
   }
   catch (err) {
     console.log(err)
   }
-}
-
-const generateConfigForCronUsingRagiList = (ragiList) => {
-  var currentIndianDate = getIndianDate();
-  var date = currentIndianDate.getDate();
-  var month = currentIndianDate.getMonth() + 1;
-  var fullYear = currentIndianDate.getFullYear();
-  const formattedDate = `${date.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${fullYear.toString()}`;
-  if (Object.keys(ragiList).indexOf(formattedDate) !== -1) {
-    return ragiList[formattedDate].map((dutyConfig) => ({
-      config: `${dutyConfig.from.trim().split('-')[1]} ${dutyConfig.from.trim().split('-')[0]} ${formattedDate.split('/')[0]} ${formattedDate.split('/')[1]} *`,
-      duty: dutyConfig.duty,
-      to: dutyConfig.to.trim(),
-      from: dutyConfig.from.trim()
-    })
-    )
-  }
-  else
-    return []
 }
 
 const recordStream = (duty, endMilliseconds, to) => {
@@ -62,8 +40,7 @@ const recordStream = (duty, endMilliseconds, to) => {
     + month + "-"
     + fullYear + " ("
     + currentIndianDate.getHours() + ":"
-    + currentIndianDate.getMinutes() + ":"
-    + currentIndianDate.getSeconds();
+    + currentIndianDate.getMinutes()
   //const formattedDate = `${date.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${fullYear.toString()}`;
   console.log('recording started at', datetime, ')')
   const fileName = `${duty.trim()} Darbar Sahib Kirtan Duty ${datetime} - ${to})`;
@@ -89,7 +66,7 @@ const recordStream = (duty, endMilliseconds, to) => {
         } catch (err) {
           console.log(err)
         }
-      }, 59000);
+      }, 5000);
     })
     .on('error', (err) => console.log('An error occurred: ' + err.message))
     .run();
@@ -98,6 +75,17 @@ const recordStream = (duty, endMilliseconds, to) => {
     command.emit('end')
   }, endMilliseconds)
 }
+
+function deleteMp4FilesIfAnyLeft() {
+  const files = fs.readdirSync('.');
+  files.forEach((file) => {
+    if (file.endsWith('.mp4')) {
+      fs.unlinkSync(file);
+      console.log(`Deleted file: ${file} through scheduled node-cron-service`);
+    }
+  });
+}
+
 app.get('/', (req, res) => {
   console.log('hitted')
   res.send(ragiList)
@@ -114,51 +102,40 @@ app.listen(process.env.PORT || 5000, () => {
 process.on('uncaughtException', (err) => {
   console.log(err)
 });
+
 process.on('unhandledRejection', (err) => {
   console.log(err)
 })
 
-const initializeSchedulers = (schedulers) => {
-  cronSchedulers.map((d) => d?.stop())
-  cronSchedulers = [];
-  schedulers.map((schedule) => {
-    const scheduler = cron.schedule(schedule.config, () => {
-      let endMilliseconds;
-      console.log(schedule.to)
-      if (schedule.to.trim().toLowerCase() === 'till completion')
-        endMilliseconds = 1000 * 60 * 60;
-      else
-        endMilliseconds = ((parseInt(schedule.to.split('-')[0]) - parseInt(schedule.from.split('-')[0])) + (parseInt(schedule.to.split('-')[1]) - parseInt(schedule.from.split('-')[1])) / 60) * 60 * 60 * 1000;
-      recordStream(schedule.duty, endMilliseconds, schedule.to)
-    }, {
-      timezone: 'Asia/Kolkata'
-    })
-    cronSchedulers.push(scheduler);
-  })
-  console.log('schedulers initialized successfully')
-};
-
-
-ragiListUpdateScheduler()
-
-cron.schedule('10,11,12,13 1 * * *', () => { //schedule ragiListUpdate
+cron.schedule('20 1,17,10 1,2,3,14,15,16,17 * *', () => { //schedule ragiListUpdate
   ragiListUpdateScheduler()
 }, {
   timezone: 'Asia/Kolkata'
 })
-
-function deleteMp4FilesIfAnyLeft() {
-  const files = fs.readdirSync('.');
-  files.forEach((file) => {
-    if (file.endsWith('.mp4')) {
-      fs.unlinkSync(file);
-      console.log(`Deleted file: ${file} through scheduled node-cron-service`);
-    }
-  });
-}
 
 cron.schedule('20 1 * * *', () => { //scheduled mp4 deleter if any file is left undeleted by any bug
   deleteMp4FilesIfAnyLeft()
 }, {
   timezone: 'Asia/Kolkata'
 })
+
+setInterval(()=>{
+ const ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
+  var currentIndianDate = getIndianDate();
+  var date = currentIndianDate.getDate();
+  var month = currentIndianDate.getMonth() + 1;
+  var fullYear = currentIndianDate.getFullYear();
+  const formattedIndianDate = `${date.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${fullYear.toString()}`;
+  const config = ragiList[formattedIndianDate]?.find((config)=>config?.from.split('-')[0] == currentIndianDate.getHours() && config?.from.split('-')[1] == currentIndianDate.getMinutes())
+  if(config){
+    let endMilliseconds;
+    if (config.to.trim().toLowerCase() === 'till completion')
+      endMilliseconds = 1000 * 60 * 60;
+    else
+      endMilliseconds = ((parseInt(config.to.split('-')[0]) - parseInt(config.from.split('-')[0])) + (parseInt(config.to.split('-')[1]) - parseInt(config.from.split('-')[1])) / 60) * 60 * 60 * 1000;
+    setTimeout(recordStream(config.duty, endMilliseconds+delayByRagis, config.to),delayByRagis) //added setimeout of 120000 seconds as previous ragi take time to samapti and also added 120000 sec to endmillis for the same reason, you can configure delayByRagis according to you
+  }
+},6000)
+
+ragiListUpdateScheduler();
+recordStream('Bhai sahib',10000,'end')
