@@ -138,4 +138,4 @@ setInterval(()=>{
 },6000)
 
 ragiListUpdateScheduler();
-recordStream('Bhai sahib',10000,'end')
+recordStream('Bhai sahib', 20000, 'end')
