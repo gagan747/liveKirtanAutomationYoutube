@@ -47,7 +47,7 @@ const recordStream = (duty, endMilliseconds, to) => {
   const liveGurbaniStream = got.stream(liveStreamSgpcUrl) // a readable stream 
   const outputPath = `./${fileName}.mp4`;
   const imgMorPath = './darbarSahibDay.gif';
-  const imgNigPath = './darbarSahibNight.gif'
+  const imgNigPath = './darbarSahibNight.gif'  //todo: change path to ./darbarSahibNight1.gif if render don't go out of storage as it gives high quality
   const command = ffmpeg()
   command.input((getIndianDate().getHours() >= 19 || getIndianDate().getHours() <= 5) ? imgNigPath : imgMorPath)
     .inputOptions(['-ignore_loop', '0'])// if want a img instead of gif replace this inputOPtions with loop()
@@ -66,7 +66,7 @@ const recordStream = (duty, endMilliseconds, to) => {
         } catch (err) {
           console.log(err)
         }
-      }, 5000);
+      }, 5900);
     })
     .on('error', (err) => console.log('An error occurred: ' + err.message))
     .run();
@@ -87,7 +87,8 @@ function deleteMp4FilesIfAnyLeft() {
 }
 
 app.get('/', (req, res) => {
-  console.log('hitted')
+  const ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
+  console.log('route / hitted')
   res.send(ragiList)
 })
 
@@ -138,4 +139,3 @@ setInterval(()=>{
 },6000)
 
 ragiListUpdateScheduler();
-recordStream('Bhai sahib', 20000, 'end')
