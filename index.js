@@ -134,7 +134,7 @@ setInterval(()=>{
       endMilliseconds = 1000 * 60 * 60;
     else
       endMilliseconds = ((parseInt(config.to.split('-')[0]) - parseInt(config.from.split('-')[0])) + (parseInt(config.to.split('-')[1]) - parseInt(config.from.split('-')[1])) / 60) * 60 * 60 * 1000;
-    setTimeout(()=>recordStream(config.duty, endMilliseconds+delayByRagis, config.to),delayByRagis) //added setimeout of 120000 seconds as previous ragi take time to samapti and also added 120000 sec to endmillis for the same reason, you can configure delayByRagis according to you
+    setTimeout(()=>recordStream(config.duty, endMilliseconds, config.to),delayByRagis) //added setimeout of 120000 seconds as previous ragi take time to samapti and also added 120000 sec to endmillis for the same reason, you can configure delayByRagis according to you
   }
 },60000)
 
