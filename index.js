@@ -13,9 +13,9 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 const app = express();
 const delayByRagis = 120000; 
 
-setInterval(function () {//for preventing render to become unidle
-  https.get("https://livekirtandarbarsahibrecordingautomation.onrender.com/");
-}, 300000);
+setInterval(function () {//for preventing cyclic to become unidle
+  https.get("https://unusual-pear-cloak.cyclic.app/");
+}, 800000);
 
 const getIndianDate = () => new Date(new Date().toLocaleString(undefined, { timeZone: 'Asia/Kolkata' }));
 
