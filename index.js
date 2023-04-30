@@ -11,6 +11,7 @@ import { uploadToYoutube } from './uploadToYoutube.js';
 import { path as ffmpegPath } from '@ffmpeg-installer/ffmpeg';
 ffmpeg.setFfmpegPath(ffmpegPath);
 const app = express();
+let ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
 const delayByRagis = 120000; 
 
 setInterval(function () {//for preventing render to become unidle
@@ -23,6 +24,7 @@ const ragiListUpdateScheduler = async () => {
   try {
     await createUpdateRagiList()
     console.log('ragi list updated sussessfully ')
+    ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
   }
   catch (err) {
     console.log(err)
@@ -87,7 +89,6 @@ function deleteMp4FilesIfAnyLeft() {
 }
 
 app.get('/', (req, res) => {
-  const ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
   console.log('hitted')
   res.send(ragiList)
 })
@@ -120,23 +121,22 @@ cron.schedule('20 1 * * *', () => { //scheduled mp4 deleter if any file is left 
   timezone: 'Asia/Kolkata'
 })
 
-// setInterval(()=>{
-//  const ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
-//   var currentIndianDate = getIndianDate();
-//   var date = currentIndianDate.getDate();
-//   var month = currentIndianDate.getMonth() + 1;
-//   var fullYear = currentIndianDate.getFullYear();
-//   const formattedIndianDate = `${date.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${fullYear.toString()}`;
-//   const config = ragiList[formattedIndianDate]?.find((config)=>config?.from.split('-')[0] == currentIndianDate.getHours() && config?.from.split('-')[1] == currentIndianDate.getMinutes())
-//   if(config){
-//     let endMilliseconds;
-//     if (config.to.trim().toLowerCase() === 'till completion')
-//       endMilliseconds = 1000 * 60 * 60;
-//     else
-//       endMilliseconds = ((parseInt(config.to.split('-')[0]) - parseInt(config.from.split('-')[0])) + (parseInt(config.to.split('-')[1]) - parseInt(config.from.split('-')[1])) / 60) * 60 * 60 * 1000;
-//     setTimeout(recordStream(config.duty, endMilliseconds+delayByRagis, config.to),delayByRagis) //added setimeout of 120000 seconds as previous ragi take time to samapti and also added 120000 sec to endmillis for the same reason, you can configure delayByRagis according to you
-//   }
-// },60000)
+setInterval(() => {
+  const currentIndianDate = getIndianDate();
+  const formattedDate = `${currentIndianDate.getDate().toString().padStart(2, '0')}/${(currentIndianDate.getMonth() + 1).toString().padStart(2, '0')}/${currentIndianDate.getFullYear().toString()}`;
+  const config = ragiList[formattedDate]?.find(({ from }) => {
+    const [hours, minutes] = from.split('-');
+    return hours == currentIndianDate.getHours() && minutes == currentIndianDate.getMinutes();
+  });
+
+  if (config) {
+    const endMilliseconds = config.to.trim().toLowerCase() === 'till completion'
+      ? 1000 * 60 * 60
+      : ((parseInt(config.to.split('-')[0]) - parseInt(config.from.split('-')[0])) + (parseInt(config.to.split('-')[1]) - parseInt(config.from.split('-')[1])) / 60)  * 3600000;
+
+    setTimeout(() => recordStream(config.duty, endMilliseconds + delayByRagis, config.to), delayByRagis);
+  }
+}, 60000);
 
 ragiListUpdateScheduler();
 recordStream('Bhai sahib', 3600000, 'end')
