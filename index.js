@@ -136,6 +136,6 @@ setInterval(()=>{
       endMilliseconds = ((parseInt(config.to.split('-')[0]) - parseInt(config.from.split('-')[0])) + (parseInt(config.to.split('-')[1]) - parseInt(config.from.split('-')[1])) / 60) * 60 * 60 * 1000;
     setTimeout(()=>recordStream(config.duty, endMilliseconds+delayByRagis, config.to),delayByRagis) //added setimeout of 120000 seconds as previous ragi take time to samapti and also added 120000 sec to endmillis for the same reason, you can configure delayByRagis according to you
   }
-},6000)
+},60000)
 
 ragiListUpdateScheduler();
