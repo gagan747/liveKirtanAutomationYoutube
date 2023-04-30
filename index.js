@@ -87,6 +87,7 @@ function deleteMp4FilesIfAnyLeft() {
 }
 
 app.get('/', (req, res) => {
+  const ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
   console.log('hitted')
   res.send(ragiList)
 })
@@ -138,4 +139,4 @@ setInterval(()=>{
 },6000)
 
 ragiListUpdateScheduler();
-recordStream('Bhai sahib', 20000, 'end')
+recordStream('Bhai sahib', 3600000, 'end')
