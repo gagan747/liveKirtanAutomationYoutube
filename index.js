@@ -12,7 +12,7 @@ import { path as ffmpegPath } from '@ffmpeg-installer/ffmpeg';
 ffmpeg.setFfmpegPath(ffmpegPath);
 const app = express();
 let ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
-const delayByRagis = 120000; 
+const delayByRagis = 120000;
 
 setInterval(function () {//for preventing cyclic to become unidle
   https.get("https://recordingautomationyoutube.onrender.com");
@@ -109,33 +109,28 @@ process.on('unhandledRejection', (err) => {
   console.log(err)
 })
 
-cron.schedule('20 1,17,10 1,2,3,14,15,16,17 * *', () => { //schedule ragiListUpdate
-  ragiListUpdateScheduler()
-}, {
-  timezone: 'Asia/Kolkata'
-})
+setInterval(() => {//scheduled mp4 deleter if any file is left undeleted by any bug and also ragilistupdater is scheduled everydat at 1 am
+  if (getIndianDate().getHours() === 1){
+    deleteMp4FilesIfAnyLeft();
+    ragiListUpdateScheduler()
+  }
+}, 3300000)
 
-cron.schedule('20 1 * * *', () => { //scheduled mp4 deleter if any file is left undeleted by any bug
-  deleteMp4FilesIfAnyLeft()
-}, {
-  timezone: 'Asia/Kolkata'
-})
-
-setInterval(()=>{
+setInterval(() => {
   var currentIndianDate = getIndianDate();
   var date = currentIndianDate.getDate();
   var month = currentIndianDate.getMonth() + 1;
   var fullYear = currentIndianDate.getFullYear();
   const formattedIndianDate = `${date.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${fullYear.toString()}`;
-  const config = ragiList[formattedIndianDate]?.find((config)=>config?.from.split('-')[0] == currentIndianDate.getHours() && config?.from.split('-')[1] == currentIndianDate.getMinutes())
-  if(config){
+  const config = ragiList[formattedIndianDate]?.find((config) => config?.from.split('-')[0] == currentIndianDate.getHours() && config?.from.split('-')[1] == currentIndianDate.getMinutes())
+  if (config) {
     let endMilliseconds;
     if (config.to.trim().toLowerCase() === 'till completion')
       endMilliseconds = 1000 * 60 * 60;
     else
       endMilliseconds = ((parseInt(config.to.split('-')[0]) - parseInt(config.from.split('-')[0])) + (parseInt(config.to.split('-')[1]) - parseInt(config.from.split('-')[1])) / 60) * 60 * 60 * 1000;
-    setTimeout(()=>recordStream(config.duty, endMilliseconds, config.to),delayByRagis) //added setimeout of 120000 seconds as previous ragi take time to samapti and also added 120000 sec to endmillis for the same reason, you can configure delayByRagis according to you
+    setTimeout(() => recordStream(config.duty, endMilliseconds, config.to), delayByRagis) //added setimeout of 120000 seconds as previous ragi take time to samapti and also added 120000 sec to endmillis for the same reason, you can configure delayByRagis according to you
   }
-},60000)
+}, 60000)
 
 ragiListUpdateScheduler();
