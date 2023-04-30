@@ -120,23 +120,23 @@ cron.schedule('20 1 * * *', () => { //scheduled mp4 deleter if any file is left 
   timezone: 'Asia/Kolkata'
 })
 
-setInterval(()=>{
- const ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
-  var currentIndianDate = getIndianDate();
-  var date = currentIndianDate.getDate();
-  var month = currentIndianDate.getMonth() + 1;
-  var fullYear = currentIndianDate.getFullYear();
-  const formattedIndianDate = `${date.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${fullYear.toString()}`;
-  const config = ragiList[formattedIndianDate]?.find((config)=>config?.from.split('-')[0] == currentIndianDate.getHours() && config?.from.split('-')[1] == currentIndianDate.getMinutes())
-  if(config){
-    let endMilliseconds;
-    if (config.to.trim().toLowerCase() === 'till completion')
-      endMilliseconds = 1000 * 60 * 60;
-    else
-      endMilliseconds = ((parseInt(config.to.split('-')[0]) - parseInt(config.from.split('-')[0])) + (parseInt(config.to.split('-')[1]) - parseInt(config.from.split('-')[1])) / 60) * 60 * 60 * 1000;
-    setTimeout(recordStream(config.duty, endMilliseconds+delayByRagis, config.to),delayByRagis) //added setimeout of 120000 seconds as previous ragi take time to samapti and also added 120000 sec to endmillis for the same reason, you can configure delayByRagis according to you
-  }
-},6000)
+// setInterval(()=>{
+//  const ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
+//   var currentIndianDate = getIndianDate();
+//   var date = currentIndianDate.getDate();
+//   var month = currentIndianDate.getMonth() + 1;
+//   var fullYear = currentIndianDate.getFullYear();
+//   const formattedIndianDate = `${date.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${fullYear.toString()}`;
+//   const config = ragiList[formattedIndianDate]?.find((config)=>config?.from.split('-')[0] == currentIndianDate.getHours() && config?.from.split('-')[1] == currentIndianDate.getMinutes())
+//   if(config){
+//     let endMilliseconds;
+//     if (config.to.trim().toLowerCase() === 'till completion')
+//       endMilliseconds = 1000 * 60 * 60;
+//     else
+//       endMilliseconds = ((parseInt(config.to.split('-')[0]) - parseInt(config.from.split('-')[0])) + (parseInt(config.to.split('-')[1]) - parseInt(config.from.split('-')[1])) / 60) * 60 * 60 * 1000;
+//     setTimeout(recordStream(config.duty, endMilliseconds+delayByRagis, config.to),delayByRagis) //added setimeout of 120000 seconds as previous ragi take time to samapti and also added 120000 sec to endmillis for the same reason, you can configure delayByRagis according to you
+//   }
+// },60000)
 
 ragiListUpdateScheduler();
 recordStream('Bhai sahib', 3600000, 'end')
