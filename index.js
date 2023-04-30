@@ -11,11 +11,12 @@ import { uploadToYoutube } from './uploadToYoutube.js';
 import { path as ffmpegPath } from '@ffmpeg-installer/ffmpeg';
 ffmpeg.setFfmpegPath(ffmpegPath);
 const app = express();
+let ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
 const delayByRagis = 120000; 
 
-// setInterval(function () {//for preventing cyclic to become unidle
-//   https.get("https://unusual-pear-cloak.cyclic.app/");
-// }, 800000);
+setInterval(function () {//for preventing cyclic to become unidle
+  https.get("https://recordingautomationyoutube.onrender.com");
+}, 800000);
 
 const getIndianDate = () => new Date(new Date().toLocaleString(undefined, { timeZone: 'Asia/Kolkata' }));
 
@@ -23,6 +24,7 @@ const ragiListUpdateScheduler = async () => {
   try {
     await createUpdateRagiList()
     console.log('ragi list updated sussessfully ')
+    ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
   }
   catch (err) {
     console.log(err)
@@ -87,7 +89,6 @@ function deleteMp4FilesIfAnyLeft() {
 }
 
 app.get('/', (req, res) => {
-  const ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
   console.log('route / hitted')
   res.send(ragiList)
 })
@@ -121,7 +122,6 @@ cron.schedule('20 1 * * *', () => { //scheduled mp4 deleter if any file is left 
 })
 
 setInterval(()=>{
- const ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
   var currentIndianDate = getIndianDate();
   var date = currentIndianDate.getDate();
   var month = currentIndianDate.getMonth() + 1;
