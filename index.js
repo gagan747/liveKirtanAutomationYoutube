@@ -15,7 +15,7 @@ const delayByRagis = 120000;
 
 setInterval(function () {//for preventing cyclic to become unidle
   https.get("https://recordingautomationyoutube.onrender.com");
-}, 800000);
+}, 300000);
 
 const getIndianDate = () => new Date(new Date().toLocaleString(undefined, { timeZone: 'Asia/Kolkata' }));
 
