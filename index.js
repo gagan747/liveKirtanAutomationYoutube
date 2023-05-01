@@ -4,7 +4,6 @@ import express from 'express';
 import dotenv from 'dotenv';
 import https from 'https'
 dotenv.config();
-import cron from 'node-cron';
 import ffmpeg from 'fluent-ffmpeg';
 import fs from 'fs';
 import { uploadToYoutube } from './uploadToYoutube.js';
