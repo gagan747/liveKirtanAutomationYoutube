@@ -67,7 +67,7 @@ const recordStream = (duty, endMilliseconds, to) => {
         } catch (err) {
           console.log(err)
         }
-      }, 5900);
+      }, 59000);
     })
     .on('error', (err) => console.log('An error occurred: ' + err.message))
     .run();
@@ -82,7 +82,7 @@ function deleteMp4FilesIfAnyLeft() {
   files.forEach((file) => {
     if (file.endsWith('.mp4')) {
       fs.unlinkSync(file);
-      console.log(`Deleted file: ${file} through scheduled node-cron-service`);
+      console.log(`Deleted file: ${file} through scheduled node-cron-service or manually`);
     }
   });
 }
@@ -98,6 +98,18 @@ app.get('/google/callback', (req, res) => {
 
 app.listen(process.env.PORT || 5000, () => {
   console.log(`server listening on port 5000`);
+});
+
+app.get('/mp4files', (req, res) => {
+  const files = fs.readdirSync('./').filter(file=>file.endsWith('.mp4'));
+  const fileList = files.join('</br>');
+  res.set('Content-Type', 'text/html');
+  res.send(fileList);
+});
+
+app.get('/currentproject', (req, res) => {
+  const currentDirectoryInfo = fs.readFileSync('./trackCurrentProjectCredentials.json','UTF-8');
+  res.send(currentDirectoryInfo);
 });
 
 process.on('uncaughtException', (err) => {
@@ -131,5 +143,5 @@ setInterval(() => {
     setTimeout(() => recordStream(config.duty, endMilliseconds, config.to), delayByRagis) //added setimeout of 120000 seconds as previous ragi take time to samapti and also added 120000 sec to endmillis for the same reason, you can configure delayByRagis according to you
   }
 }, 60000)
-
+deleteMp4FilesIfAnyLeft()
 ragiListUpdateScheduler();
