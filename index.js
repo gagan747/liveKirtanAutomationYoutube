@@ -112,8 +112,10 @@ app.get('/mp4files', (req, res) => {
   res.send(fileList);
 });
 
-app.get('/currentproject', (req, res) => {
-  const currentDirectoryInfo = fs.readFileSync('./trackCurrentProjectCredentials.json', 'UTF-8');
+app.get('/currentproject', async(req, res) => {
+  const current = await redisClient.get('current');
+  const perProjectQuota = await redisClient.get('perProjectQuota');
+  const currentDirectoryInfo = {current, perProjectQuota}
   res.send(currentDirectoryInfo);
 });
 
