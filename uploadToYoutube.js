@@ -18,31 +18,33 @@ const SCOPES = [
 
 
 // Load client secrets from a local file.
-export const uploadToYoutube = (outputPath) => {
-  let { current, perProjectQuota } = JSON.parse(fs.readFileSync('./trackCurrentProjectCredentials.json', 'UTF-8'));
-  perProjectQuota += 1;
-  if (perProjectQuota === 7) {
-    current += 1;
-    perProjectQuota = 0;
-    if (current === 4)
-      current = 1
-  }
-  fs.writeFileSync('./trackCurrentProjectCredentials.json', JSON.stringify({
-    current,
-    perProjectQuota
-  }))
-  const content = {
-    web: {
-      client_secret: process.env[`client_secret${current}`],
-      client_id: process.env[`client_id${current}`],
-      redirect_uris: [process.env[`redirect_uri${current}`]]
+export const uploadToYoutube = async (outputPath, redisClient) => {
+  try {
+    let current = parseInt(await redisClient.get('current'));
+    let perProjectQuota = parseInt(await redisClient.get('perProjectQuota'))
+    perProjectQuota += 1;
+    if (perProjectQuota === 7) {
+      current += 1;
+      perProjectQuota = 0;
+      if (current === 4)
+        current = 1
     }
+    console.log(current,perProjectQuota)
+    await redisClient.set('current', current);
+    await redisClient.set('perProjectQuota', perProjectQuota)
+    const content = {
+      web: {
+        client_secret: process.env[`client_secret${current}`],
+        client_id: process.env[`client_id${current}`],
+        redirect_uris: [process.env[`redirect_uri${current}`]]
+      }
+    }
+    let upload = uploadVideo.bind({ outputPath })
+   authorize(content, upload); // Authorize a client with the loaded credentials, then call the YouTube API.
+  } catch (err) {
+    console.log(err)
+    return
   }
-  let upload = uploadVideo.bind({ outputPath })
-  authorize(content, upload);
-
-  // Authorize a client with the loaded credentials, then call the YouTube API.
-
 }
 
 /**

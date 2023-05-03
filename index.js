@@ -1,8 +1,10 @@
 import { createUpdateRagiList } from "./services/createUpdateRagiList.js";
+import getRedisClient from './redis.js'
 import got from 'got';
 import express from 'express';
 import dotenv from 'dotenv';
 import https from 'https'
+let redisClient;
 dotenv.config();
 import ffmpeg from 'fluent-ffmpeg';
 import fs from 'fs';
@@ -63,11 +65,11 @@ const recordStream = (duty, endMilliseconds, to) => {
       setTimeout(() => {
         try {
           console.log('upload to youtube started for', outputPath)
-          uploadToYoutube(outputPath)
+          uploadToYoutube(outputPath,redisClient)
         } catch (err) {
           console.log(err)
         }
-      }, 59000);
+      }, 5900);
     })
     .on('error', (err) => console.log('An error occurred: ' + err.message))
     .run();
@@ -96,19 +98,22 @@ app.get('/google/callback', (req, res) => {
   res.send(req.query)
 })
 
-app.listen(process.env.PORT || 5000, () => {
+app.listen(process.env.PORT || 5000, async () => {
   console.log(`server listening on port 5000`);
+ redisClient = await getRedisClient();
+  ragiListUpdateScheduler();
+  deleteMp4FilesIfAnyLeft()
 });
 
 app.get('/mp4files', (req, res) => {
-  const files = fs.readdirSync('./').filter(file=>file.endsWith('.mp4'));
+  const files = fs.readdirSync('./').filter(file => file.endsWith('.mp4'));
   const fileList = files.join('</br>');
   res.set('Content-Type', 'text/html');
   res.send(fileList);
 });
 
 app.get('/currentproject', (req, res) => {
-  const currentDirectoryInfo = fs.readFileSync('./trackCurrentProjectCredentials.json','UTF-8');
+  const currentDirectoryInfo = fs.readFileSync('./trackCurrentProjectCredentials.json', 'UTF-8');
   res.send(currentDirectoryInfo);
 });
 
@@ -121,7 +126,7 @@ process.on('unhandledRejection', (err) => {
 })
 
 setInterval(() => {//scheduled mp4 deleter if any file is left undeleted by any bug and also ragilistupdater is scheduled everydat at 1 am
-  if (getIndianDate().getHours() === 1){
+  if (getIndianDate().getHours() === 1) {
     deleteMp4FilesIfAnyLeft();
     ragiListUpdateScheduler()
   }
@@ -143,5 +148,3 @@ setInterval(() => {
     setTimeout(() => recordStream(config.duty, endMilliseconds, config.to), delayByRagis) //added setimeout of 120000 seconds as previous ragi take time to samapti and also added 120000 sec to endmillis for the same reason, you can configure delayByRagis according to you
   }
 }, 60000)
-deleteMp4FilesIfAnyLeft()
-ragiListUpdateScheduler();

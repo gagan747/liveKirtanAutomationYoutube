@@ -25,6 +25,7 @@
     "googleapis": "^118.0.0",
     "got": "^12.6.0",
     "node-schedule": "^2.1.1",
-    "pdfreader": "^3.0.0"
+    "pdfreader": "^3.0.0",
+    "redis": "^4.6.6"
   }
 }
