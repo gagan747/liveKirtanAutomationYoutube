@@ -15,9 +15,9 @@ const app = express();
 let ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
 const delayByRagis = 120000;
 
-setInterval(function () {//for preventing cyclic to become unidle
-  https.get("https://recordingautomationyoutube.onrender.com");
-}, 300000);
+// setInterval(function () {//for preventing cyclic to become unidle
+//   https.get("https://recordingautomationyoutube.onrender.com");
+// }, 300000);
 
 const getIndianDate = () => new Date(new Date().toLocaleString(undefined, { timeZone: 'Asia/Kolkata' }));
 
