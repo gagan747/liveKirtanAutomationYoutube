@@ -40,7 +40,7 @@ export const uploadToYoutube = async (outputPath, redisClient) => {
       }
     }
     let upload = uploadVideo.bind({ outputPath })
-   authorize(content, upload); // Authorize a client with the loaded credentials, then call the YouTube API.
+   authorize(content, upload,redisClient); // Authorize a client with the loaded credentials, then call the YouTube API.
   } catch (err) {
     console.log(err)
     return
@@ -54,16 +54,16 @@ export const uploadToYoutube = async (outputPath, redisClient) => {
  * @param {Object} credentials The authorization client credentials.
  * @param {function} callback The callback to call with the authorized client.
  */
-function authorize(credentials, callback) {
+async function authorize(credentials, callback,redisClient) {
   var clientSecret = credentials.web.client_secret;
   var clientId = credentials.web.client_id;
   var redirectUrl = credentials.web.redirect_uris[0];
   var oauth2Client = new OAuth2(clientId, clientSecret, redirectUrl);
   // Check if we have previously stored a token.
-  if (!process.env[`token_for_project${JSON.parse(fs.readFileSync('./trackCurrentProjectCredentials.json', 'UTF-8')).current}`]) {
+  if (!process.env[`token_for_project${parseInt(await redisClient.get('current'))}`]) {
     getNewToken(oauth2Client, callback);
   } else {
-    oauth2Client.credentials = JSON.parse(process.env[`token_for_project${JSON.parse(fs.readFileSync('./trackCurrentProjectCredentials.json', 'UTF-8')).current}`]);
+    oauth2Client.credentials = process.env[`token_for_project${parseInt(await redisClient.get('current'))}`]
     callback(oauth2Client);
   }
 }
