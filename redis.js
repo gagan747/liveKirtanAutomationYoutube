@@ -10,7 +10,7 @@ async function getRedisClient() {
  try {
   await client.connect(); // can also listen for events 'on connect' and 'on error' but used await like syntax
   console.log('connected to redis client');
-  await client.set('current', 0, { 'NX': true });
+  await client.set('current', 1, { 'NX': true });
   await client.set('perProjectQuota', 0, { 'NX': true });
   return client;
  } catch (err) {

@@ -102,7 +102,7 @@ app.listen(process.env.PORT || 5000, async () => {
   console.log(`server listening on port 5000`);
  redisClient = await getRedisClient();
   ragiListUpdateScheduler();
-  deleteMp4FilesIfAnyLeft()
+  deleteMp4FilesIfAnyLeft();
 });
 
 app.get('/mp4files', (req, res) => {

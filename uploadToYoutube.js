@@ -29,7 +29,6 @@ export const uploadToYoutube = async (outputPath, redisClient) => {
       if (current === 4)
         current = 1
     }
-    console.log(current,perProjectQuota)
     await redisClient.set('current', current);
     await redisClient.set('perProjectQuota', perProjectQuota)
     const content = {
@@ -60,10 +59,11 @@ async function authorize(credentials, callback,redisClient) {
   var redirectUrl = credentials.web.redirect_uris[0];
   var oauth2Client = new OAuth2(clientId, clientSecret, redirectUrl);
   // Check if we have previously stored a token.
-  if (!process.env[`token_for_project${parseInt(await redisClient.get('current'))}`]) {
+  const currentToken = await redisClient.get('current');
+  if (!process.env[`token_for_project${currentToken}`]) {
     getNewToken(oauth2Client, callback);
   } else {
-    oauth2Client.credentials = process.env[`token_for_project${parseInt(await redisClient.get('current'))}`]
+    oauth2Client.credentials = process.env[`token_for_project${currentToken}`]
     callback(oauth2Client);
   }
 }
@@ -126,6 +126,7 @@ function storeToken(token) {
  */
 let uploadVideo = function (auth) {
   let outputPath = this.outputPath
+  console.log(auth)
   service.videos.insert(
     {
       auth: auth,
