@@ -65,11 +65,11 @@ const recordStream = (duty, endMilliseconds, to) => {
       setTimeout(() => {
         try {
           console.log('upload to youtube started for', outputPath)
-          uploadToYoutube(outputPath,redisClient)
+          uploadToYoutube(outputPath, redisClient)
         } catch (err) {
           console.log(err)
         }
-      }, 5900);
+      }, 59000);
     })
     .on('error', (err) => console.log('An error occurred: ' + err.message))
     .run();
@@ -100,7 +100,7 @@ app.get('/google/callback', (req, res) => {
 
 app.listen(process.env.PORT || 5000, async () => {
   console.log(`server listening on port 5000`);
- redisClient = await getRedisClient();
+  redisClient = await getRedisClient();
   ragiListUpdateScheduler();
   deleteMp4FilesIfAnyLeft();
 });
@@ -112,10 +112,10 @@ app.get('/mp4files', (req, res) => {
   res.send(fileList);
 });
 
-app.get('/currentproject', async(req, res) => {
+app.get('/currentproject', async (req, res) => {
   const current = await redisClient.get('current');
   const perProjectQuota = await redisClient.get('perProjectQuota');
-  const currentDirectoryInfo = {current, perProjectQuota}
+  const currentDirectoryInfo = { current, perProjectQuota }
   res.send(currentDirectoryInfo);
 });
 
@@ -150,3 +150,4 @@ setInterval(() => {
     setTimeout(() => recordStream(config.duty, endMilliseconds, config.to), delayByRagis) //added setimeout of 120000 seconds as previous ragi take time to samapti and also added 120000 sec to endmillis for the same reason, you can configure delayByRagis according to you
   }
 }, 60000)
+//recordStream('bhai', 10000, 'to')

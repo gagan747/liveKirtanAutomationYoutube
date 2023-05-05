@@ -19,31 +19,29 @@ const SCOPES = [
 
 // Load client secrets from a local file.
 export const uploadToYoutube = async (outputPath, redisClient) => {
-  try {
-    let current = parseInt(await redisClient.get('current'));
-    let perProjectQuota = parseInt(await redisClient.get('perProjectQuota'))
-    perProjectQuota += 1;
-    if (perProjectQuota === 7) {
-      current += 1;
-      perProjectQuota = 0;
-      if (current === 4)
-        current = 1
-    }
-    await redisClient.set('current', current);
-    await redisClient.set('perProjectQuota', perProjectQuota)
-    const content = {
-      web: {
-        client_secret: process.env[`client_secret${current}`],
-        client_id: process.env[`client_id${current}`],
-        redirect_uris: [process.env[`redirect_uri${current}`]]
-      }
-    }
-    let upload = uploadVideo.bind({ outputPath })
-   authorize(content, upload,redisClient); // Authorize a client with the loaded credentials, then call the YouTube API.
-  } catch (err) {
-    console.log(err)
-    return
+  let current = parseInt(await redisClient.get('current'));
+  let perProjectQuota = parseInt(await redisClient.get('perProjectQuota'))
+  perProjectQuota += 1;
+  if (perProjectQuota === 7) {
+    current += 1;
+    perProjectQuota = 0;
+    if (current === 4)
+      current = 1
   }
+  await redisClient.set('current', current);
+  await redisClient.set('perProjectQuota', perProjectQuota)
+  const content = {
+    web: {
+      client_secret: process.env[`client_secret${current}`],
+      client_id: process.env[`client_id${current}`],
+      redirect_uris: [process.env[`redirect_uri${current}`]]
+    }
+  }
+  let upload = uploadVideo.bind({ outputPath })
+  authorize(content, upload, redisClient);
+
+  // Authorize a client with the loaded credentials, then call the YouTube API.
+
 }
 
 /**
@@ -53,17 +51,17 @@ export const uploadToYoutube = async (outputPath, redisClient) => {
  * @param {Object} credentials The authorization client credentials.
  * @param {function} callback The callback to call with the authorized client.
  */
-async function authorize(credentials, callback,redisClient) {
+async function authorize(credentials, callback, redisClient) {
   var clientSecret = credentials.web.client_secret;
   var clientId = credentials.web.client_id;
   var redirectUrl = credentials.web.redirect_uris[0];
   var oauth2Client = new OAuth2(clientId, clientSecret, redirectUrl);
   // Check if we have previously stored a token.
-  const currentToken = await redisClient.get('current');
-  if (!process.env[`token_for_project${currentToken}`]) {
+  let current = parseInt(await redisClient.get('current'));
+  if (!process.env[`token_for_project${current}`]) {
     getNewToken(oauth2Client, callback);
   } else {
-    oauth2Client.credentials = process.env[`token_for_project${currentToken}`]
+    oauth2Client.credentials = JSON.parse(process.env[`token_for_project${current}`]);
     callback(oauth2Client);
   }
 }
@@ -126,7 +124,6 @@ function storeToken(token) {
  */
 let uploadVideo = function (auth) {
   let outputPath = this.outputPath
-  console.log(auth)
   service.videos.insert(
     {
       auth: auth,
