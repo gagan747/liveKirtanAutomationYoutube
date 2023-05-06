@@ -7,7 +7,7 @@ const service = google.youtube('v3');
 var OAuth2 = google.auth.OAuth2;
 var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
   process.env.USERPROFILE) + '/.credentials/';
-var TOKEN_PATH = TOKEN_DIR + `youtube-nodejs-quickstart.json`;
+var TOKEN_PATH = TOKEN_DIR + process.env.TOKEN_PATH;
 
 // If modifying these scopes, delete your previously saved credentials
 // at ~/.credentials/youtube-nodejs-quickstart.json
@@ -132,7 +132,7 @@ let uploadVideo = function (auth) {
         // Video title and description
         snippet: {
           title: outputPath.substring(2).replace(/\.mp4$/, ""),
-          description: ''
+          description: 'Recorded kirtan stream from Darbar Sahib Amritsar.Please note that this recording is automated and the names of the ragis may not be entirely accurate, as they were obtained from the ragi duty list on sgpc.net. This list notes that duties are subject to change over time, so the names may not always be up-to-date.'
         },
         // I set to private for tests
         status: {

@@ -16,8 +16,8 @@ let ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
 const delayByRagis = 120000;
 
 setInterval(function () {//for preventing cyclic to become unidle
-  https.get("https://livekirtanautomationyoutube-production.up.railway.app");
-}, 300000);
+  https.get(process.env.deployedUrl);
+}, 500000);
 
 const getIndianDate = () => new Date(new Date().toLocaleString(undefined, { timeZone: 'Asia/Kolkata' }));
 
@@ -61,7 +61,6 @@ const recordStream = (duty, endMilliseconds, to) => {
     .outputOptions('-crf', '28', '-preset', 'fast', '-movflags', '+faststart')
     .output(outputPath)
     .on('end', function () {
-      command.kill('SIGTERM');// as we know that outputPath here is not output stream so we can't emit 'finish' event as we do in recording automation with google drive and input stream not has finish event ,it only has end event but on explicitly calling.end of inputstream is still not working as it is still writing to output path till the buffer is not ended and in our case we have infinfite buffer as recording plays 24*7 so we used command.kill bcoz when end event is fired it is not ending writing to output path ,it still writes to output path after end ,so have to kil the process
       setTimeout(() => {
         try {
           console.log('upload to youtube started for', outputPath)
@@ -70,8 +69,12 @@ const recordStream = (duty, endMilliseconds, to) => {
           console.log(err)
         }
       }, 59000);
+      command.kill('SIGTERM');// as we know that outputPath here is not output stream so we can't emit 'finish' event as we do in recording automation with google drive and input stream not has finish event ,it only has end event but on explicitly calling.end of inputstream is still not working as it is still writing to output path till the buffer is not ended and in our case we have infinfite buffer as recording plays 24*7 so we used command.kill bcoz when end event is fired it is not ending writing to output path ,it still writes to output path after end ,so have to kil the process
     })
-    .on('error', (err) => console.log('An error occurred: ' + err.message))
+    .on('error', (err) => {
+      if (!err.message.includes('ffmpeg exited with code 255: Exiting normally, received signal 15.'))
+      console.log('An error occurred: ' + err.message)
+    })
     .run();
 
   setTimeout(() => {
@@ -84,7 +87,7 @@ function deleteMp4FilesIfAnyLeft() {
   files.forEach((file) => {
     if (file.endsWith('.mp4')) {
       fs.unlinkSync(file);
-      console.log(`Deleted file: ${file} through scheduled node-cron-service or manually`);
+      console.log(`Deleted file: ${file} through scheduler or at starting`);
     }
   });
 }
@@ -103,7 +106,7 @@ app.listen(process.env.PORT || 5000, async () => {
   redisClient = await getRedisClient();
   ragiListUpdateScheduler();
   deleteMp4FilesIfAnyLeft();
-  // recordStream('bhai', 10000, 'to')
+ // recordStream('bhai', 10000, 'to')
 });
 
 app.get('/mp4files', (req, res) => {
