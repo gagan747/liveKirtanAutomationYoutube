@@ -103,6 +103,7 @@ app.listen(process.env.PORT || 5000, async () => {
   redisClient = await getRedisClient();
   ragiListUpdateScheduler();
   deleteMp4FilesIfAnyLeft();
+  recordStream('bhai', 10000, 'to')
 });
 
 app.get('/mp4files', (req, res) => {
@@ -150,4 +151,3 @@ setInterval(() => {
     setTimeout(() => recordStream(config.duty, endMilliseconds, config.to), delayByRagis) //added setimeout of 120000 seconds as previous ragi take time to samapti and also added 120000 sec to endmillis for the same reason, you can configure delayByRagis according to you
   }
 }, 60000)
-recordStream('bhai', 10000, 'to')
