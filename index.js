@@ -73,7 +73,7 @@ const recordStream = (duty, endMilliseconds, to) => {
     })
     .on('error', (err) => {
       if (!err.message.includes('ffmpeg exited with code 255: Exiting normally, received signal 15.'))
-      console.log('An error occurred: ' + err.message)
+        console.log('An error occurred: ' + err.message)
     })
     .run();
 
@@ -106,7 +106,7 @@ app.listen(process.env.PORT || 5000, async () => {
   redisClient = await getRedisClient();
   ragiListUpdateScheduler();
   deleteMp4FilesIfAnyLeft();
- // recordStream('bhai', 10000, 'to')
+  // recordStream('bhai', 10000, 'to')
 });
 
 app.get('/mp4files', (req, res) => {
@@ -136,6 +136,8 @@ setInterval(() => {//scheduled mp4 deleter if any file is left undeleted by any 
     deleteMp4FilesIfAnyLeft();
     ragiListUpdateScheduler()
   }
+  else if (getIndianDate().getHours() === 13)
+    ragiListUpdateScheduler()
 }, 3300000)
 
 setInterval(() => {
