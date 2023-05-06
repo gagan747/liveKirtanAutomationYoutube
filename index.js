@@ -36,6 +36,7 @@ const recordStream = (duty, endMilliseconds, to) => {
   console.log('recordinds ends after ', endMilliseconds, 'milliseconds')
   const liveStreamSgpcUrl = 'https://live.sgpc.net:8443/;nocache=889869';
   var currentIndianDate = getIndianDate();
+  console.log(currentIndianDate)
   var date = currentIndianDate.getDate();
   var month = currentIndianDate.getMonth() + 1;
   var fullYear = currentIndianDate.getFullYear()
