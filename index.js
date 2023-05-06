@@ -15,9 +15,9 @@ const app = express();
 let ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
 const delayByRagis = 120000;
 
-// setInterval(function () {//for preventing cyclic to become unidle
-//   https.get("https://recordingautomationyoutube.onrender.com");
-// }, 300000);
+setInterval(function () {//for preventing cyclic to become unidle
+  https.get("https://livekirtanautomationyoutube-production.up.railway.app");
+}, 300000);
 
 const getIndianDate = () => new Date(new Date().toLocaleString(undefined, { timeZone: 'Asia/Kolkata' }));
 
@@ -36,7 +36,6 @@ const recordStream = (duty, endMilliseconds, to) => {
   console.log('recordinds ends after ', endMilliseconds, 'milliseconds')
   const liveStreamSgpcUrl = 'https://live.sgpc.net:8443/;nocache=889869';
   var currentIndianDate = getIndianDate();
-  console.log(currentIndianDate)
   var date = currentIndianDate.getDate();
   var month = currentIndianDate.getMonth() + 1;
   var fullYear = currentIndianDate.getFullYear()
@@ -104,7 +103,7 @@ app.listen(process.env.PORT || 5000, async () => {
   redisClient = await getRedisClient();
   ragiListUpdateScheduler();
   deleteMp4FilesIfAnyLeft();
-  recordStream('bhai', 10000, 'to')
+  // recordStream('bhai', 10000, 'to')
 });
 
 app.get('/mp4files', (req, res) => {
