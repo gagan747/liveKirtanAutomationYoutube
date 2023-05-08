@@ -23,7 +23,7 @@ export const uploadToYoutube = (outputPath) => {
   perProjectQuota += 1;
   if (perProjectQuota === 7) {
     current += 1;
-    perProjectQuota = 0;
+    perProjectQuota = 1;
     if (current === 4)
       current = 1
   }
