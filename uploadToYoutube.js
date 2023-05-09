@@ -131,8 +131,8 @@ let uploadVideo = function (auth) {
       resource: {
         // Video title and description
         snippet: {
-          title: outputPath.substring(2).replace(/\.mp4$/, ""),
-          description: 'Recorded kirtan stream from Darbar Sahib Amritsar.Please note that this recording is automated and the names of the ragis may not be entirely accurate, as they were obtained from the ragi duty list on sgpc.net. This list notes that duties are subject to change over time, so the names may not always be up-to-date.'
+          title: outputPath.substring(2).replace(/\.mov$/, ""),
+          description: ''
         },
         // I set to private for tests
         status: {

@@ -48,7 +48,7 @@ const recordStream = (duty, endMilliseconds, to) => {
   console.log('recording started at', datetime, ')')
   const fileName = `${duty.trim()} Darbar Sahib Kirtan Duty ${datetime} - ${to})`;
   const liveGurbaniStream = got.stream(liveStreamSgpcUrl) // a readable stream 
-  const outputPath = `./${fileName}.mp4`;
+  const outputPath = `./${fileName}.mov`;
   const imgMorPath = './darbarSahibDay.gif';
   const imgNigPath = './darbarSahibNight.gif'  //todo: change path to ./darbarSahibNight1.gif if render don't go out of storage as it gives high quality
   const command = ffmpeg()
@@ -60,6 +60,7 @@ const recordStream = (duty, endMilliseconds, to) => {
     .videoCodec('libx264')
     .outputOptions('-crf', '28', '-preset', 'fast', '-movflags', '+faststart')
     .output(outputPath)
+    .format('mov')
     .on('end', function () {
       setTimeout(() => {
         try {
@@ -69,7 +70,7 @@ const recordStream = (duty, endMilliseconds, to) => {
           console.log(err)
         }
       }, 59000);
-      command.kill('SIGTERM');// as we know that outputPath here is not output stream so we can't emit 'finish' event as we do in recording automation with google drive and input stream not has finish event ,it only has end event but on explicitly calling.end of inputstream is still not working as it is still writing to output path till the buffer is not ended and in our case we have infinfite buffer as recording plays 24*7 so we used command.kill bcoz when end event is fired it is not ending writing to output path ,it still writes to output path after end ,so have to kil the process
+      command.ffmpegProc.kill()// as we know that outputPath here is not output stream so we can't emit 'finish' event as we do in recording automation with google drive and input stream not has finish event ,it only has end event but on explicitly calling.end of inputstream is still not working as it is still writing to output path till the buffer is not ended and in our case we have infinfite buffer as recording plays 24*7 so we used command.kill bcoz when end event is fired it is not ending writing to output path ,it still writes to output path after end ,so have to kil the process
     })
     .on('error', (err) => {
       if (!err.message.includes('ffmpeg exited with code 255: Exiting normally, received signal 15.'))
@@ -85,7 +86,7 @@ const recordStream = (duty, endMilliseconds, to) => {
 function deleteMp4FilesIfAnyLeft() {
   const files = fs.readdirSync('.');
   files.forEach((file) => {
-    if (file.endsWith('.mp4')) {
+    if (file.endsWith('.mov')) {
       fs.unlinkSync(file);
       console.log(`Deleted file: ${file} through scheduler or at starting`);
     }
@@ -106,7 +107,7 @@ app.listen(process.env.PORT || 5000, async () => {
   redisClient = await getRedisClient();
   ragiListUpdateScheduler();
   deleteMp4FilesIfAnyLeft();
-  //  recordStream('bhai', 10000, 'to')
+  recordStream('bhai', 10000, 'to')
 });
 
 app.get('/mp4files', (req, res) => {
