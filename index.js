@@ -111,7 +111,7 @@ app.listen(process.env.PORT || 5000, async () => {
 });
 
 app.get('/mp4files', (req, res) => {
-  const files = fs.readdirSync('./').filter(file => file.endsWith('.mp4'));
+  const files = fs.readdirSync('./').filter(file => file.endsWith('.mov'));
   const fileList = files.join('</br>');
   res.set('Content-Type', 'text/html');
   res.send(fileList);
