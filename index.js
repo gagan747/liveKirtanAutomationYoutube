@@ -32,7 +32,19 @@ const ragiListUpdateScheduler = async () => {
   }
 }
 
-const recordStream = (duty, endMilliseconds, to) => {
+const getGifPath = () => {
+  const imgMorPath = './darbarSahibDay.gif';
+  const imgNigPath = './darbarSahibNight.gif';
+  const imgNigPath1 = './darbarSahibNight1.gif'
+  if (getIndianDate().getHours() >= 19 || getIndianDate().getHours() < 3)
+    return imgNigPath1;
+  else if (getIndianDate().getHours() >= 3 || getIndianDate().getHours() < 5)
+    return imgNigPath
+  else
+    return imgMorPath
+}
+
+const recordStream = (duty, endMilliseconds, to, from) => {
   console.log('recordinds ends after ', endMilliseconds, 'milliseconds')
   const liveStreamSgpcUrl = 'https://live.sgpc.net:8443/;nocache=889869';
   var currentIndianDate = getIndianDate();
@@ -42,17 +54,13 @@ const recordStream = (duty, endMilliseconds, to) => {
   var datetime = date + "-"//for creating unique filename
     + month + "-"
     + fullYear + " ("
-    + currentIndianDate.getHours() + ":"
-    + currentIndianDate.getMinutes()
-  //const formattedDate = `${date.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${fullYear.toString()}`;
+    + from;
   console.log('recording started at', datetime, ')')
   const fileName = `${duty.trim()} Darbar Sahib Kirtan Duty ${datetime} - ${to})`;
   const liveGurbaniStream = got.stream(liveStreamSgpcUrl) // a readable stream 
   const outputPath = `./${fileName}.mov`;
-  const imgMorPath = './darbarSahibDay.gif';
-  const imgNigPath = './darbarSahibNight.gif'  //todo: change path to ./darbarSahibNight1.gif if render don't go out of storage as it gives high quality
   const command = ffmpeg()
-  command.input((getIndianDate().getHours() >= 19 || getIndianDate().getHours() <= 5) ? imgNigPath : imgMorPath)
+  command.input(getGifPath())
     .inputOptions(['-ignore_loop', '0'])// if want a img instead of gif replace this inputOPtions with loop()
     .input(liveGurbaniStream) //it goes to event loop and when the on('data') event fires it converts to video and writes to output path and the process continues until we manually stop input stream  
     .audioCodec('aac')
@@ -107,7 +115,7 @@ app.listen(process.env.PORT || 5000, async () => {
   redisClient = await getRedisClient();
   ragiListUpdateScheduler();
   deleteMp4FilesIfAnyLeft();
- // recordStream('bhai', 10000, 'to')
+  //recordStream('bhai', 10000, 'to')
 });
 
 app.get('/mp4files', (req, res) => {
@@ -151,9 +159,9 @@ setInterval(() => {
   if (config) {
     let endMilliseconds;
     if (config.to.trim().toLowerCase() === 'till completion')
-      endMilliseconds = 1000 * 60 * 60;
+      endMilliseconds = 1000 * 60 * 90;
     else
       endMilliseconds = ((parseInt(config.to.split('-')[0]) - parseInt(config.from.split('-')[0])) + (parseInt(config.to.split('-')[1]) - parseInt(config.from.split('-')[1])) / 60) * 60 * 60 * 1000;
-    setTimeout(() => recordStream(config.duty, endMilliseconds, config.to), delayByRagis) //added setimeout of 120000 seconds as previous ragi take time to samapti and also added 120000 sec to endmillis for the same reason, you can configure delayByRagis according to you
+    setTimeout(() => recordStream(config.duty, endMilliseconds, config.to, config.from), delayByRagis) //added setimeout of 120000 seconds as previous ragi take time to samapti and also added 120000 sec to endmillis for the same reason, you can configure delayByRagis according to you
   }
 }, 60000)
