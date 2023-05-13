@@ -115,7 +115,7 @@ app.listen(process.env.PORT || 5000, async () => {
   redisClient = await getRedisClient();
   ragiListUpdateScheduler();
   deleteMp4FilesIfAnyLeft();
-  //recordStream('bhai', 10000, 'to')
+  //recordStream('bhai', 10000, 'to', 'from')
 });
 
 app.get('/mp4files', (req, res) => {
