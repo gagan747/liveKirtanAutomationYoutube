@@ -32,18 +32,6 @@ const ragiListUpdateScheduler = async () => {
   }
 }
 
-const getGifPath = () => {
-  const imgMorPath = './darbarSahibDay.gif';
-  const imgNigPath = './darbarSahibNight.gif';
-  const imgNigPath1 = './darbarSahibNight1.gif'
-  if (getIndianDate().getHours() >= 19 || getIndianDate().getHours() < 3)
-    return imgNigPath1;
-  else if (getIndianDate().getHours() >= 3 && getIndianDate().getHours() < 5)
-    return imgNigPath
-  else
-    return imgMorPath
-}
-
 const recordStream = (duty, endMilliseconds, to, from) => {
   console.log('recordinds ends after ', endMilliseconds, 'milliseconds')
   const liveStreamSgpcUrl = 'https://live.sgpc.net:8443/;nocache=889869';
@@ -59,14 +47,16 @@ const recordStream = (duty, endMilliseconds, to, from) => {
   const fileName = `${duty.trim()} Darbar Sahib Kirtan Duty ${datetime} - ${to})`;
   const liveGurbaniStream = got.stream(liveStreamSgpcUrl) // a readable stream 
   const outputPath = `./${fileName}.mov`;
+  const imgMorPath = './darbarSahibDay.gif';
+  const imgNigPath = './darbarSahibNight.gif';
   const command = ffmpeg()
-  command.input(getGifPath())
+  command.input((getIndianDate().getHours() >= 19 || getIndianDate().getHours() <= 5) ? imgNigPath : imgMorPath)
     .inputOptions(['-ignore_loop', '0'])// if want a img instead of gif replace this inputOPtions with loop()
     .input(liveGurbaniStream) //it goes to event loop and when the on('data') event fires it converts to video and writes to output path and the process continues until we manually stop input stream  
     .audioCodec('aac')
     .audioBitrate('128k') //higher bitrate for higher quality
     .videoCodec('libx264')
-    .outputOptions('-crf', '29', '-preset', 'veryfast', '-movflags', '+faststart') //lower values of crf means high quality and high memory usage and high file size and preset values(veryslow, slow, medium, fast, verfast) of veryslow means highest quality/filesize/memoryusage and reverse is also true for both crf and preset.So adjust accordingly to your hosting platform if it has low RAM(memory), its a trade-off between ram and quality
+    .outputOptions('-crf', '28', '-preset', 'fast', '-movflags', '+faststart') //lower values of crf means high quality and high memory usage and high file size and preset values(veryslow, slow, medium, fast, verfast) of veryslow means highest quality/filesize/memoryusage and reverse is also true for both crf and preset.So adjust accordingly to your hosting platform if it has low RAM(memory), its a trade-off between ram and quality
     .output(outputPath)
     .format('mov')
     .on('end', function () {
