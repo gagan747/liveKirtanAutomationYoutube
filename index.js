@@ -38,7 +38,7 @@ const getGifPath = () => {
   const imgNigPath1 = './darbarSahibNight1.gif'
   if (getIndianDate().getHours() >= 19 || getIndianDate().getHours() < 3)
     return imgNigPath1;
-  else if (getIndianDate().getHours() >= 3 || getIndianDate().getHours() < 5)
+  else if (getIndianDate().getHours() >= 3 && getIndianDate().getHours() < 5)
     return imgNigPath
   else
     return imgMorPath
