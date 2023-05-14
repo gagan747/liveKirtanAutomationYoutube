@@ -43,6 +43,7 @@ const recordStream = (duty, endMilliseconds, to, from) => {
     + month + "-"
     + fullYear + " ("
     + from;
+  //const formattedDate = `${date.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${fullYear.toString()}`;
   console.log('recording started at', datetime, ')')
   const fileName = `${duty.trim()} Darbar Sahib Kirtan Duty ${datetime} - ${to})`;
   const liveGurbaniStream = got.stream(liveStreamSgpcUrl) // a readable stream 
@@ -105,7 +106,7 @@ app.listen(process.env.PORT || 5000, async () => {
   redisClient = await getRedisClient();
   ragiListUpdateScheduler();
   deleteMp4FilesIfAnyLeft();
-  //recordStream('bhai', 20000, 'to')
+  // recordStream('bhai', 10000, 'to')
 });
 
 app.get('/mp4files', (req, res) => {
