@@ -119,8 +119,8 @@ app.get('/mp4files', (req, res) => {
 app.get('/currentproject', async (req, res) => {
   const current = await redisClient.get('current');
   const perProjectQuota = await redisClient.get('perProjectQuota');
-  const currentDirectoryInfo = { current, perProjectQuota }
-  res.send(currentDirectoryInfo);
+  const currentProjectInfo = { current, perProjectQuota }
+  res.send(currentProjectInfo);
 });
 
 process.on('uncaughtException', (err) => {
@@ -141,10 +141,10 @@ setInterval(() => {//scheduled mp4 deleter if any file is left undeleted by any 
 }, 3300000)
 
 setInterval(() => {
-  var currentIndianDate = getIndianDate();
-  var date = currentIndianDate.getDate();
-  var month = currentIndianDate.getMonth() + 1;
-  var fullYear = currentIndianDate.getFullYear();
+  const currentIndianDate = getIndianDate();
+  const date = currentIndianDate.getDate();
+  const month = currentIndianDate.getMonth() + 1;
+  const fullYear = currentIndianDate.getFullYear();
   const formattedIndianDate = `${date.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${fullYear.toString()}`;
   const config = ragiList[formattedIndianDate]?.find((config) => config?.from.split('-')[0] == currentIndianDate.getHours() && config?.from.split('-')[1] == currentIndianDate.getMinutes())
   if (config) {
@@ -153,6 +153,6 @@ setInterval(() => {
       endMilliseconds = 1000 * 60 * 90;
     else
       endMilliseconds = ((parseInt(config.to.split('-')[0]) - parseInt(config.from.split('-')[0])) + (parseInt(config.to.split('-')[1]) - parseInt(config.from.split('-')[1])) / 60) * 60 * 60 * 1000;
-    setTimeout(() => recordStream(config.duty, endMilliseconds, config.to, config.from), delayByRagis) //added setimeout of 120000 seconds as previous ragi take time to samapti and also added 120000 sec to endmillis for the same reason, you can configure delayByRagis according to you
+    recordStream(config.duty, endMilliseconds, config.to, config.from)
   }
 }, 60000)
