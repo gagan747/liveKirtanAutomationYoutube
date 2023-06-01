@@ -12,6 +12,7 @@ import { uploadToYoutube } from './uploadToYoutube.js';
 import { path as ffmpegPath } from '@ffmpeg-installer/ffmpeg';
 ffmpeg.setFfmpegPath(ffmpegPath);
 const app = express();
+const servers = ['server1', 'server2'];
 let ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
 const delayByRagis = 120000;
 
@@ -32,7 +33,12 @@ const ragiListUpdateScheduler = async () => {
   }
 }
 
-const recordStream = (duty, endMilliseconds, to, from) => {
+const recordStream = async (duty, endMilliseconds, to, from) => {
+  if (!(await redisClient.get('currentServer') === process.env.currentServer))
+    return;
+  setTimeout(async () => {
+    await redisClient.set('currentServer', servers.find((server) => server !== process.env.currentServer))
+  }, 59000)
   console.log('recordinds ends after ', endMilliseconds, 'milliseconds')
   const liveStreamSgpcUrl = 'https://live.sgpc.net:8443/;nocache=889869';
   var currentIndianDate = getIndianDate();
@@ -117,7 +123,8 @@ app.get('/mp4files', (req, res) => {
 app.get('/currentproject', async (req, res) => {
   const current = await redisClient.get('current');
   const perProjectQuota = await redisClient.get('perProjectQuota');
-  const currentProjectInfo = { current, perProjectQuota }
+  const currentServer = await redisClient.get('currentServer');
+  const currentProjectInfo = { current, perProjectQuota, currentServer }
   res.send(currentProjectInfo);
 });
 

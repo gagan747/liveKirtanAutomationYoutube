@@ -15,6 +15,7 @@ async function getRedisClient() {
   console.log('connected to redis client');
   await client.set('current', 1, { 'NX': true });
   await client.set('perProjectQuota', 0, { 'NX': true });
+  await client.set('currentServer', 'server1', { 'NX': true });
   return client;
  } catch (err) {
   console.log(err);
