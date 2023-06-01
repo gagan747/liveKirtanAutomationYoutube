@@ -58,12 +58,13 @@ const recordStream = (duty, endMilliseconds, to, from) => {
     .audioBitrate('128k') //higher bitrate for higher quality
     .videoCodec('libx264')
     .outputOptions('-crf', '28', '-preset', 'fast', '-movflags', '+faststart') //lower values of crf means high quality and high memory usage and high file size and preset values(veryslow, slow, medium, fast, verfast) of veryslow means highest quality/filesize/memoryusage and reverse is also true for both crf and preset.So adjust accordingly to your hosting platform if it has low RAM(memory), its a trade-off between ram and quality
-    .format('flv')
+    .output(outputPath)
+    .format('mov')
     .on('end', function () {
       setTimeout(() => {
         try {
           console.log('upload to youtube started for', outputPath)
-         // uploadToYoutube(outputPath, redisClient)
+          uploadToYoutube(outputPath, redisClient)
         } catch (err) {
           console.log(err)
         }
@@ -74,7 +75,7 @@ const recordStream = (duty, endMilliseconds, to, from) => {
       if (!err.message.includes('ffmpeg exited with code 255: Exiting normally, received signal 15.'))
         console.log('An error occurred: ' + err.message)
     })
-    .pipe(fs.createWriteStream(outputPath), {end: true});
+    .run();
 
   setTimeout(() => {
     command.emit('end')
@@ -105,7 +106,7 @@ app.listen(process.env.PORT || 5000, async () => {
   redisClient = await getRedisClient();
   ragiListUpdateScheduler();
   deleteMp4FilesIfAnyLeft();
-   recordStream('bhai', 10000000, 'to')
+  // recordStream('bhai', 10000, 'to')
 });
 
 app.get('/mp4files', (req, res) => {
