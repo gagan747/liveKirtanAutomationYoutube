@@ -60,6 +60,11 @@ const recordStream = async (duty, endMilliseconds, to, from) => {
   command.input((getIndianDate().getHours() >= 19 || getIndianDate().getHours() <= 5) ? imgNigPath : imgMorPath)
     .inputOptions(['-ignore_loop', '0'])// if want a img instead of gif replace this inputOPtions with loop()
     .input(liveGurbaniStream) //it goes to event loop and when the on('data') event fires it converts to video and writes to output path and the process continues until we manually stop input stream  
+    .audioFilters('highpass=f=200, lowpass=f=3000, volume=2dB')
+    .audioCodec('aac')
+    .audioBitrate('256k')
+    .audioChannels(2)
+    .withAudioQuality(5)
     .videoCodec('libx264')
     .outputOptions('-crf', '28', '-preset', 'fast', '-movflags', '+faststart') //lower values of crf means high quality and high memory usage and high file size and preset values(veryslow, slow, medium, fast, verfast) of veryslow means highest quality/filesize/memoryusage and reverse is also true for both crf and preset.So adjust accordingly to your hosting platform if it has low RAM(memory), its a trade-off between ram and quality
     .output(outputPath)
