@@ -2,6 +2,7 @@ import fs from 'fs';
 import readline from 'readline';
 import { google } from 'googleapis';
 import dotenv from 'dotenv';
+import { getIndianDate } from './helper.js';
 dotenv.config();
 const service = google.youtube('v3');
 var OAuth2 = google.auth.OAuth2;
@@ -74,6 +75,14 @@ async function authorize(credentials, callback, redisClient) {
  * @param {getEventsCallback} callback The callback to call with the authorized
  *     client.
  */
+const deleteFile = (outputPath) => {
+  fs.unlink(outputPath, function (err) {
+    if (err) throw err;
+    // if no error, file has been deleted successfully
+    console.log(outputPath.substring(2) + 'deleted!');
+  });
+}
+
 function getNewToken(oauth2Client, callback) {
   var authUrl = oauth2Client.generateAuthUrl({
     access_type: 'offline',
@@ -123,44 +132,57 @@ function storeToken(token) {
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
 let uploadVideo = function (auth) {
-  let outputPath = this.outputPath
-  service.videos.insert(
-    {
-      auth: auth,
-      part: 'snippet,contentDetails,status',
-      resource: {
-        // Video title and description
-        snippet: {
-          title: outputPath.substring(2).replace(/\.mov$/, ""),
-          description: ''
+  try {
+    let outputPath = this.outputPath
+    service.videos.insert(
+      {
+        auth: auth,
+        part: 'snippet,contentDetails,status',
+        resource: {
+          // Video title and description
+          snippet: {
+            title: outputPath.substring(2).replace(/\.mov$/, ""),
+            description: `Recorded kirtan stream from Darbar Sahib Amritsar.Please note that this recording is automated and the names of the ragis may not be entirely accurate, as they were obtained from the ragi duty list on sgpc.net.This list notes that duties are subject to change over time, so the names may not always be up- to - date`,
+            tags: ['live kirtan', 'live kirtan recordings', 'live keertan', 'live kirtan darbar sahib', 'hazoori ragi darbar sahib', 'amritsar kirtan recordings', 'asa ki vaar', 'bilawal chowki', 'sodar chowki', 'tin phera chowki']
+          },
+          // I set to private for tests
+          status: {
+            privacyStatus: 'private'
+          }
         },
-        // I set to private for tests
-        status: {
-          privacyStatus: 'private'
+
+        // Create the readable stream to upload the video
+        media: {
+          body: fs.createReadStream(outputPath) // Change here to your real video
         }
       },
-
-      // Create the readable stream to upload the video
-      media: {
-        body: fs.createReadStream(outputPath) // Change here to your real video
+      (error, response) => {
+        if (error) {
+          console.log(error);
+          deleteFile(outputPath)
+          return
+        }
+        console.log('uploaded')
+        deleteFile(outputPath)
+        console.log('Video uploaded. Uploading the thumbnail now.')
+        if (getIndianDate().getHours() >= 19 || getIndianDate().getHours() <= 5) {
+          service.thumbnails.set({
+            auth: auth,
+            videoId: response.data.id,
+            media: {
+              body: fs.createReadStream('./thumbnail.png')
+            },
+          }, function (err, response) {
+            if (err) {
+              console.log('The API returned an error: ' + err);
+              return;
+            }
+          })
+        }
       }
-    },
-    (error, data) => {
-      if (error) {
-        console.log(error);
-        fs.unlink(outputPath, function (err) {
-          if (err) throw err;
-          // if no error, file has been deleted successfully
-          console.log(outputPath.substring(2) + 'deleted!');
-        });
-        return
-      }
-      console.log('uploaded')
-      fs.unlink(outputPath, function (err) {
-        if (err) throw err;
-        // if no error, file has been deleted successfully
-        console.log(outputPath.substring(2) + 'deleted!');
-      });
-    }
-  );
+    );
+  } catch (err) {
+    console.log(err)
+    throw err
+  }
 };

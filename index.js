@@ -7,6 +7,7 @@ import https from 'https'
 let redisClient;
 dotenv.config();
 import ffmpeg from 'fluent-ffmpeg';
+import { getIndianDate } from "./helper.js";
 import fs from 'fs';
 import { uploadToYoutube } from './uploadToYoutube.js';
 import { path as ffmpegPath } from '@ffmpeg-installer/ffmpeg';
@@ -16,11 +17,9 @@ const servers = ['server1', 'server2'];
 let ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
 const delayByRagis = 120000;
 
-setInterval(function () {//for preventing cyclic to become unidle
+setInterval(function () {//for preventing free deployed server to become idle
   https.get(process.env.deployedUrl);
 }, 500000);
-
-const getIndianDate = () => new Date(new Date().toLocaleString(undefined, { timeZone: 'Asia/Kolkata' }));
 
 const ragiListUpdateScheduler = async () => {
   try {
@@ -51,7 +50,7 @@ const recordStream = async (duty, endMilliseconds, to, from) => {
     + from;
   //const formattedDate = `${date.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${fullYear.toString()}`;
   console.log('recording started at', datetime, ')')
-  const fileName = `${duty.trim()} Darbar Sahib Kirtan Duty ${datetime} - ${to})`;
+  const fileName = `${duty.trim()} Darbar Sahib ${getKirtanType(from, to) || 'Kirtan Duty '}${datetime} - ${to})`;
   const liveGurbaniStream = got.stream(liveStreamSgpcUrl) // a readable stream 
   const outputPath = `./${fileName}.mov`;
   const imgMorPath = './darbarSahibDay.gif';
@@ -141,7 +140,7 @@ process.on('unhandledRejection', (err) => {
   console.log(err)
 })
 
-setInterval(() => {//scheduled mp4 deleter if any file is left undeleted by any bug and also ragilistupdater is scheduled everydat at 1 am
+setInterval(() => {//scheduled mp4 deleter if any file is left undeleted by any bug and also ragilistupdater is scheduled everyday at 1 am
   if (getIndianDate().getHours() === 1) {
     deleteMp4FilesIfAnyLeft();
     ragiListUpdateScheduler()
@@ -166,3 +165,14 @@ setInterval(() => {
     recordStream(config.duty, endMilliseconds, config.to, config.from)
   }
 }, 60000)
+
+const getKirtanType = (from = '', to) => {
+  let kirtanType = ''
+  if (Number(to.split('-')[0]) - Number(from.split('-')[0]) === 3)
+    kirtanType = 'Asa Ki Vaar Kirtan Duty '
+  if (Number(from.split('-')[0]) === 2)
+    kirtanType = 'Tin Phera Kirtan Duty '
+  if (Number(to.split('-')[0]) === 8)
+    kirtanType = 'Bilawal Chowki '
+  return kirtanType
+}
