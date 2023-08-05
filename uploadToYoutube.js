@@ -165,7 +165,7 @@ let uploadVideo = function (auth) {
         console.log('uploaded')
         deleteFile(outputPath)
         console.log('Video uploaded. Uploading the thumbnail now.')
-        if (getIndianDate().getHours() >= 19 || getIndianDate().getHours() <= 5) {
+        if (getIndianDate().getHours() > 20 || getIndianDate().getHours() <= 7) {
           service.thumbnails.set({
             auth: auth,
             videoId: response.data.id,
