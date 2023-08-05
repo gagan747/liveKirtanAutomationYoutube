@@ -15,7 +15,7 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 const app = express();
 const servers = ['server1', 'server2'];
 let ragiList = JSON.parse(fs.readFileSync('./ragiList.json', 'UTF-8'));
-const delayByRagis = 120000;
+const delayByRagis = 210000;
 
 setInterval(function () {//for preventing free deployed server to become idle
   https.get(process.env.deployedUrl);
@@ -162,7 +162,7 @@ setInterval(() => {
       endMilliseconds = 1000 * 60 * 90;
     else
       endMilliseconds = ((parseInt(config.to.split('-')[0]) - parseInt(config.from.split('-')[0])) + (parseInt(config.to.split('-')[1]) - parseInt(config.from.split('-')[1])) / 60) * 60 * 60 * 1000;
-    recordStream(config.duty, endMilliseconds, config.to, config.from)
+    recordStream(config.duty, endMilliseconds+delayByRagis, config.to, config.from)
   }
 }, 60000)
 
