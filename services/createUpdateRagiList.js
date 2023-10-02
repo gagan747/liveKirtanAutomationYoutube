@@ -113,7 +113,7 @@ const generateListValidity = (singleString) => {
 const generateKeertanTimingsArray = (str) => {
   str = removeDateEntriesFromString(str); //as encountring bug if date also exist as for eg 02-11 is same as 02-11-23 as it pick up 02-11 from date and counclude -23 part as * but i don't want this behaviour
   const regexToGroupMultipleTableEntries =
-    /\d{1}\s{18}\d(.+?)(?=\d{1}\s{18}\d|$)/gm; //the regex returns all the data after 1              2            3                 4(which is named group 1 by me as it is first table)in its first index  uptill it encounters 5              6             7(which is named group2 by me)and all the data after 5      6         7... in second index  in the form of array
+    /(\d+(?:\s+\d+)+)(.*?)(?=\s+\d+(?:\s+\d+)+|$)/gm; //the regex returns all the data after 1              2            3                 4(which is named group 1 by me as it is first table)in its first index  uptill it encounters 5              6             7(which is named group2 by me)and all the data after 5      6         7... in second index  in the form of array
   const timingsArrayGroupedByTable = str
     .match(regexToGroupMultipleTableEntries)
     .reduce(
