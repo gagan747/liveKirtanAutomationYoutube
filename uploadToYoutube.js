@@ -87,6 +87,7 @@ function getNewToken(oauth2Client, callback) {
   var authUrl = oauth2Client.generateAuthUrl({
     access_type: "offline",
     scope: SCOPES,
+    prompt: 'consent'
   });
   console.log("Authorize this app by visiting this url: ", authUrl);
   var rl = readline.createInterface({
