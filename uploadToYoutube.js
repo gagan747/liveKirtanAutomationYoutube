@@ -176,11 +176,11 @@ let uploadVideo = function (auth) {
         }
         console.log("uploaded");
         deleteFile(outputPath);
-        console.log("Video uploaded. Uploading the thumbnail now.");
         if (
-          getIndianDate().getHours() > 20 ||
+          getIndianDate().getHours() >= 20 ||
           getIndianDate().getHours() <= 7
         ) {
+          console.log("Video uploaded. Uploading the thumbnail now.");
           service.thumbnails.set(
             {
               auth: auth,
@@ -194,6 +194,7 @@ let uploadVideo = function (auth) {
                 console.log("The API returned an error: " + err);
                 return;
               }
+              console.log('thumbnail uploaded')
             },
           );
         }
