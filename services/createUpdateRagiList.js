@@ -198,6 +198,9 @@ const populateRagisToTimingsArray = (
   let ragisArrayCurrentIndexForGroup2 =
     totalDays *
     (parseInt(timingsArrayGroupedByTable["Group-1"].length / 2) + 1);
+  const GURU_RAMDAS_JI_PRAKASH_DATE = new Date(process.env?.GURU_RAMDAS_JI_PRAKASH);
+  if (GURU_RAMDAS_JI_PRAKASH_DATE >= new Date(fromDate) && GURU_RAMDAS_JI_PRAKASH_DATE <= new Date(toDate))
+    ragisArrayCurrentIndexForGroup2 += parseInt((timingsArrayGroupedByTable['Group-1'].length) / 2)
   for (let date = fromDate; date <= toDate; date.setDate(date.getDate() + 1)) {
     let ragisArrayPopulationStartIndexForGroup1 =
       ragisArrayCurrentIndexForGroup1;
