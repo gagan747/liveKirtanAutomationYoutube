@@ -930,34 +930,34 @@
    "duty": "Bhai Shokeen Singh "
   },
   {
+   "from": "13-10 ",
+   "to": " 14-20",
+   "duty": "Bhai Inderjit Singh S"
+  },
+  {
    "from": "03-55",
    "to": "07-00",
-   "duty": "Bhai Inderjit Singh S"
+   "duty": "Bhai Jagtar Singh  "
   },
   {
    "from": "07-10",
    "to": "08-00",
-   "duty": "Bhai Jagtar Singh  "
-  },
-  {
-   "from": "08-00",
-   "to": "09-00",
    "duty": "Bhai Harjot Singh Zakhmi"
-  },
-  {
-   "from": "13-10 ",
-   "to": " 14-20",
-   "duty": "Bhai Shokeen Singh "
   },
   {
    "from": "14-20 ",
    "to": " 15-20",
-   "duty": "Bhai Jagtar Singh  "
+   "duty": "Bhai Gurmeet Singh Shant"
+  },
+  {
+   "from": "08-00",
+   "to": "09-00",
+   "duty": "Bhai Jaswant Singh "
   },
   {
    "from": "15-20 ",
    "to": " 16-20",
-   "duty": "Bhai Harjot Singh Zakhmi"
+   "duty": "Bhai Satinderbir Singh "
   },
   {
    "from": "09-00",
@@ -965,116 +965,116 @@
    "duty": "Bhai Karaj Singh "
   },
   {
-   "from": "10-00",
-   "to": "11-00",
+   "from": "16-20 ",
+   "to": " 18-00",
    "duty": "Bhai Sandeep Singh "
   },
   {
-   "from": "11-00",
-   "to": "12-00",
+   "from": "10-00",
+   "to": "11-00",
    "duty": "Bhai Gurdev Singh A"
-  },
-  {
-   "from": "12-00 ",
-   "to": " 13-10",
-   "duty": "Bhai Randhir Singh "
-  },
-  {
-   "from": "16-20 ",
-   "to": " 18-00",
-   "duty": "Bhai Karaj Singh "
   },
   {
    "from": "18-20 ",
    "to": " 19-30",
-   "duty": "Bhai Sandeep Singh "
+   "duty": "Bhai Randhir Singh "
+  },
+  {
+   "from": "11-00",
+   "to": "12-00",
+   "duty": "Bhai Karnail Singh "
   },
   {
    "from": "19-30 ",
    "to": " 20-30",
-   "duty": "Bhai Gurdev Singh A"
+   "duty": "Bhai Jagtar Singh J"
+  },
+  {
+   "from": "12-00 ",
+   "to": " 13-10",
+   "duty": "Bhai Sukhjit Singh Ko"
   },
   {
    "from": "20-30 ",
    "to": " till Completion",
-   "duty": "Bhai Randhir Singh "
+   "duty": "Bhai Lakhwinder Singh "
   }
  ],
  "31/10/2023": [
   {
    "from": "03-00",
    "to": "03-55",
-   "duty": "Bhai Gurmeet Singh Shant"
+   "duty": "Bhai Gurpreet Singh A "
   },
   {
    "from": "03-55",
    "to": "07-00",
-   "duty": "Bhai Jaswant Singh "
+   "duty": "Bhai Bhupinder Singh  "
   },
   {
    "from": "07-10",
    "to": "08-00",
-   "duty": "Bhai Satinderbir Singh "
+   "duty": "Bhai Harwinder Singh  "
   },
   {
    "from": "08-00",
    "to": "09-00",
-   "duty": "Bhai Gurpreet Singh A "
+   "duty": "Bhai Daljeet Singh "
   },
   {
    "from": "13-10 ",
    "to": " 14-20",
-   "duty": "Bhai Gurmeet Singh Shant"
+   "duty": "Bhai Gurpreet Singh A "
   },
   {
    "from": "14-20 ",
    "to": " 15-20",
-   "duty": "Bhai Satinderbir Singh "
+   "duty": "Bhai Harwinder Singh  "
   },
   {
    "from": "15-20 ",
    "to": " 16-20",
-   "duty": "Bhai Gurpreet Singh A "
+   "duty": "Bhai Daljeet Singh "
   },
   {
    "from": "09-00",
    "to": "10-00",
-   "duty": "Bhai Karnail Singh "
+   "duty": "Bhai Simarpreet Singh  "
   },
   {
    "from": "10-00",
    "to": "11-00",
-   "duty": "Bhai Jagtar Singh J"
+   "duty": "Bhai Tarbalbir Singh  "
   },
   {
    "from": "11-00",
    "to": "12-00",
-   "duty": "Bhai Sukhjit Singh Ko"
+   "duty": "Bhai Lakhbir Singh  "
   },
   {
    "from": "12-00 ",
    "to": " 13-10",
-   "duty": "Bhai Lakhwinder Singh "
+   "duty": "Bhai Gurdev Singh V"
   },
   {
    "from": "16-20 ",
    "to": " 18-00",
-   "duty": "Bhai Karnail Singh "
+   "duty": "Bhai Simarpreet Singh  "
   },
   {
    "from": "18-20 ",
    "to": " 19-30",
-   "duty": "Bhai Jagtar Singh J"
+   "duty": "Bhai Tarbalbir Singh  "
   },
   {
    "from": "19-30 ",
    "to": " 20-30",
-   "duty": "Bhai Sukhjit Singh Ko"
+   "duty": "Bhai Lakhbir Singh  "
   },
   {
    "from": "20-30 ",
    "to": " till Completion",
-   "duty": "Bhai Lakhwinder Singh "
+   "duty": "Bhai Gurdev Singh V"
   }
  ]
 }

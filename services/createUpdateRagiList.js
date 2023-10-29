@@ -198,14 +198,85 @@ const populateRagisToTimingsArray = (
   let ragisArrayCurrentIndexForGroup2 =
     totalDays *
     (parseInt(timingsArrayGroupedByTable["Group-1"].length / 2) + 1);
-  const GURU_RAMDAS_JI_PRAKASH_DATE = new Date(process.env?.GURU_RAMDAS_JI_PRAKASH);
-  if (GURU_RAMDAS_JI_PRAKASH_DATE >= new Date(fromDate) && GURU_RAMDAS_JI_PRAKASH_DATE <= new Date(toDate))
-    ragisArrayCurrentIndexForGroup2 += parseInt((timingsArrayGroupedByTable['Group-1'].length) / 2)
+  const GURU_RAMDAS_JI_PRAKASH_DATE = new Date(
+    process.env?.GURU_RAMDAS_JI_PRAKASH,
+  );
+  if (
+    GURU_RAMDAS_JI_PRAKASH_DATE >= new Date(fromDate) &&
+    GURU_RAMDAS_JI_PRAKASH_DATE <= new Date(toDate)
+  )
+    ragisArrayCurrentIndexForGroup2 += parseInt(
+      timingsArrayGroupedByTable["Group-1"].length / 2,
+    );
   for (let date = fromDate; date <= toDate; date.setDate(date.getDate() + 1)) {
     let ragisArrayPopulationStartIndexForGroup1 =
       ragisArrayCurrentIndexForGroup1;
     let ragisArrayPopulationStartIndexForGroup2 =
       ragisArrayCurrentIndexForGroup2;
+
+    if (new Date(date).getTime() == GURU_RAMDAS_JI_PRAKASH_DATE.getTime()) {
+      let indexForGroup1GURURAMDASJIPRAKASH = ragisArrayCurrentIndexForGroup1;
+      let indexForGroup2GURURAMDASJIPRAKASH = ragisArrayCurrentIndexForGroup2;
+      for (
+        let a = 0;
+        a <= timingsArrayGroupedByTable["Group-1"].length / 2;
+        a++
+      ) {
+        let dutyObj1 = {
+          from: timingsArrayGroupedByTable["Group-1"][a].split("to")[0],
+          to: timingsArrayGroupedByTable["Group-1"][a].split("to")[1],
+          duty: ragisArray[indexForGroup1GURURAMDASJIPRAKASH],
+        };
+       
+        let dutyObj2 = {
+          from: timingsArrayGroupedByTable["Group-1"][
+            a + parseInt(timingsArrayGroupedByTable["Group-1"].length / 2)+ (a >= 1 ? 0 : 1) 
+          ]?.split("to")[0],
+          to: timingsArrayGroupedByTable["Group-1"][
+            a + parseInt(timingsArrayGroupedByTable["Group-1"].length / 2) + (a >= 1 ? 0 : 1) 
+          ]?.split("to")[1],
+          duty: ragisArray[indexForGroup1GURURAMDASJIPRAKASH + 1],
+        };
+      
+        duties[date.toLocaleDateString("en-GB")] = [
+          ...(duties[date.toLocaleDateString("en-GB")] ?? []),
+          dutyObj1,
+          ...(a!==1 ? [dutyObj2] : []),
+        ];
+        indexForGroup1GURURAMDASJIPRAKASH += (a === 1 ? 1 : 2);
+      }
+      for (
+        let a = 0;
+        a < timingsArrayGroupedByTable["Group-2"].length / 2;
+        a++
+      ) {
+        let dutyObj1 = {
+          from: timingsArrayGroupedByTable["Group-2"][a].split("to")[0],
+          to: timingsArrayGroupedByTable["Group-2"][a].split("to")[1],
+          duty: ragisArray[indexForGroup2GURURAMDASJIPRAKASH],
+        };
+        let dutyObj2 = {
+          from: timingsArrayGroupedByTable["Group-2"][
+            a + parseInt(timingsArrayGroupedByTable["Group-2"].length / 2) 
+          ]?.split("to")[0],
+          to: timingsArrayGroupedByTable["Group-2"][
+            a + parseInt(timingsArrayGroupedByTable["Group-2"].length / 2) 
+          ]?.split("to")[1],
+          duty: ragisArray[indexForGroup2GURURAMDASJIPRAKASH + 1],
+        };
+        duties[date.toLocaleDateString("en-GB")] = [
+          ...(duties[date.toLocaleDateString("en-GB")] ?? []),
+          dutyObj1,
+          dutyObj2,
+        ];
+        indexForGroup2GURURAMDASJIPRAKASH += 2;
+      }
+      ragisArrayCurrentIndexForGroup1 +=
+        timingsArrayGroupedByTable["Group-1"].length;
+      ragisArrayCurrentIndexForGroup2 +=
+        timingsArrayGroupedByTable["Group-2"].length;
+      continue;
+    }
 
     const group1Data = timingsArrayGroupedByTable["Group-1"].reduce(
       (p, c, index, arr) => {
