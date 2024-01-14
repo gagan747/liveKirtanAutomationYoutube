@@ -33,14 +33,14 @@ const ragiListUpdateScheduler = async () => {
 };
 
 const recordStream = async (duty, endMilliseconds, to, from) => {
-  if (!((await redisClient.get("currentServer")) === process.env.currentServer))
-    return;
-  setTimeout(async () => {
-    await redisClient.set(
-      "currentServer",
-      servers.find((server) => server !== process.env.currentServer),
-    );
-  }, 59000);
+  // if (!((await redisClient.get("currentServer")) === process.env.currentServer))
+  //   return;
+  // setTimeout(async () => {
+  //   await redisClient.set(
+  //     "currentServer",
+  //     servers.find((server) => server !== process.env.currentServer),
+  //   );
+  // }, 59000);
   console.log("recordinds ends after ", endMilliseconds, "milliseconds");
   const liveStreamSgpcUrl = "https://live.sgpc.net:8443/;nocache=889869";
   var currentIndianDate = getIndianDate();
