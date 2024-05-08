@@ -204,7 +204,7 @@ setInterval(() => {
 
 const getKirtanType = (from = "", to) => {
   let kirtanType = "";
-  if (Number(to.split("-")[0]) - Number(from.split("-")[0]) === 3)
+  if (Number(to.split("-")[0]) - Number(from.split("-")[0]) >= 3)
     kirtanType = "Asa Ki Vaar Kirtan Duty ";
   else if (Number(from.split("-")[0]) === 2 || Number(from.split("-")[0]) === 3)
     kirtanType = "Tin Phera Kirtan Duty ";
