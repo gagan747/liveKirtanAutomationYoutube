@@ -17,10 +17,10 @@ const servers = ["server1", "server2"];
 let ragiList = JSON.parse(fs.readFileSync("./ragiList.json", "UTF-8"));
 const delayByRagis = 210000;
 
-// setInterval(function () {
-//   //for preventing free deployed server to become idle
-//   https.get(process.env.deployedUrl);
-// }, 500000);
+setInterval(function () {
+  //for preventing free deployed server to become idle
+  https.get(process.env.deployedUrl);
+}, 500000);
 
 const ragiListUpdateScheduler = async () => {
   try {
