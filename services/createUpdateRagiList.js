@@ -3,7 +3,7 @@ import axios from "axios";
 import fs from "fs";
 
 const currentDate = new Date();
-const url = `https://hs.sgpc.net/kirtan_duty_english_pdf.php`
+const url = `https://sgpc.net/wp-content/uploads/2024/11/Ragi-List_eng.pdf`
 
 
 const getRagiList = async () => {
