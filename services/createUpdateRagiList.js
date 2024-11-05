@@ -1,7 +1,10 @@
 import { PdfReader } from "pdfreader";
 import axios from "axios";
-const url = "http://old.sgpc.net/Ragi%20List_Eng.pdf";
 import fs from "fs";
+
+const currentDate = new Date();
+const url = `https://hs.sgpc.net/kirtan_duty_english_pdf.php`
+
 
 const getRagiList = async () => {
   const response = await axios({

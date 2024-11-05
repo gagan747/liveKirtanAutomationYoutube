@@ -1,24 +1,26 @@
-import { createClient } from "redis";
+import Redis from "ioredis";
 import dotenv from "dotenv";
 dotenv.config();
 
 async function getRedisClient() {
-  const client = createClient({
-    password: process.env.redisPassword,
-    socket: {
-      host: process.env.redisHost,
-      port: process.env.redisPort,
-    },
-  });
+  const serviceUri = process.env.redisHost;
+  const redis = new Redis(serviceUri);
+
   try {
-    await client.connect(); // can also listen for events 'on connect' and 'on error' but used await like syntax
-    console.log("connected to redis client");
-    await client.set("current", 1, { NX: true });
-    await client.set("perProjectQuota", 0, { NX: true });
-    await client.set("currentServer", "server1", { NX: true });
-    return client;
+    // Test connection by setting a key
+    await redis.set("current", 1, "NX");
+    await redis.set("perProjectQuota", 0, "NX");
+    await redis.set("currentServer", "server1", "NX");
+
+    console.log("Connected to Redis client");
+
+    // Example of getting a key
+    const value = await redis.get("current");
+    console.log(`The value of 'current' is: ${value}`);
+
+    return redis;
   } catch (err) {
-    console.log(err);
+    console.error(err);
     process.exit(1);
   }
 }

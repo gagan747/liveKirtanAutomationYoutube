@@ -4,10 +4,6 @@
   "description": "",
   "type": "module",
   "main": "app.js",
-  "engines": {
-    "node": "16.x",
-    "npm": "10.x"
-  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index"
@@ -25,6 +21,7 @@
     "google-auth-library": "^8.7.0",
     "googleapis": "^118.0.0",
     "got": "^12.6.0",
+    "ioredis": "^5.4.1",
     "node-schedule": "^2.1.1",
     "pdfreader": "^3.0.0",
     "redis": "^4.6.6"
