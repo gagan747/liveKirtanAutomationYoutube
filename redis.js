@@ -4,6 +4,7 @@ dotenv.config();
 
 async function getRedisClient() {
   const serviceUri = process.env.redisHost;
+  console.log(serviceUri,'-------meow');
   const redis = new Redis(serviceUri);
 
   try {
