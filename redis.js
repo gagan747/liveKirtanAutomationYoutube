@@ -1,6 +1,6 @@
-import Redis from "ioredis";
 import dotenv from "dotenv";
 dotenv.config();
+import Redis from "ioredis";
 
 async function getRedisClient() {
   const serviceUri = process.env.redisHost;

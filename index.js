@@ -1,11 +1,12 @@
 import { createUpdateRagiList } from "./services/createUpdateRagiList.js";
+import dotenv from "dotenv";
+dotenv.config();
 import getRedisClient from "./redis.js";
 import got from "got";
 import express from "express";
-import dotenv from "dotenv";
 import https from "https";
 let redisClient;
-dotenv.config();
+
 import ffmpeg from "fluent-ffmpeg";
 import { getIndianDate } from "./helper.js";
 import fs from "fs";
