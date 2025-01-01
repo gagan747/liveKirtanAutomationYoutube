@@ -64,7 +64,7 @@ const recordStream = async (duty, endMilliseconds, to, from) => {
   const liveGurbaniStream = got.stream(liveStreamSgpcUrl); // a readable stream
   const outputPath = `./${fileName}.mov`;
   const imgMorPath = "./darbarSahibDay.gif";
-  const imgNigPath = "./darbarSahibNight.gif";
+  const imgNigPath = "./darbarSahibNight2.gif";
   const command = ffmpeg();
   command
     .input(
@@ -74,7 +74,12 @@ const recordStream = async (duty, endMilliseconds, to, from) => {
     )
     .inputOptions(["-ignore_loop", "0"]) // if want a img instead of gif replace this inputOPtions with loop()
     .input(liveGurbaniStream) //it goes to event loop and when the on('data') event fires it converts to video and writes to output path and the process continues until we manually stop input stream
-    .audioFilters("highpass=f=200, lowpass=f=3000, volume=2dB")
+    .audioFilters([
+      "aecho=0.8:0.9:90|180:0.3|0.25",    // reduced delay times for quicker echo
+      "highpass=f=200",                     // keep the high pass filter
+      "lowpass=f=3000",                     // keep the low pass filter
+      "volume=2dB"                          // keep the volume adjustment
+    ])
     .audioCodec("aac")
     .audioBitrate("256k")
     .audioChannels(2)
