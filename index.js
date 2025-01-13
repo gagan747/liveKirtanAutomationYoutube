@@ -180,43 +180,22 @@ setInterval(() => {
   const formattedIndianDate = `${date.toString().padStart(2, "0")}/${month
     .toString()
     .padStart(2, "0")}/${fullYear.toString()}`;
-  const config = ragiList[formattedIndianDate]?.find((config) => {
-    const currentHour = currentIndianDate.getHours();
-    const currentMinute = currentIndianDate.getMinutes();
-    const fromHour = parseInt(config?.from.split("-")[0]);
-    const fromMinute = parseInt(config?.from.split("-")[1]);
-    const toHour = config.to.trim().toLowerCase() === "till completion" ? fromHour + 1 : parseInt(config?.to.split("-")[0]);
-    const toMinute = config.to.trim().toLowerCase() === "till completion" ? fromMinute : parseInt(config?.to.split("-")[1]);
-    
-    // Check if current time is between from and to
-    const currentTimeInMinutes = currentHour * 60 + currentMinute;
-    const fromTimeInMinutes = fromHour * 60 + fromMinute;
-    const toTimeInMinutes = toHour * 60 + toMinute;
-    
-    return currentTimeInMinutes >= fromTimeInMinutes && currentTimeInMinutes <= toTimeInMinutes;
-  });
-  
+  const config = ragiList[formattedIndianDate]?.find(
+    (config) =>
+      config?.from.split("-")[0] == currentIndianDate.getHours() &&
+      config?.from.split("-")[1] == currentIndianDate.getMinutes(),
+  );
   if (config) {
-    // Check if file already exists
-    const date = currentIndianDate.getDate();
-    const month = currentIndianDate.getMonth() + 1;
-    const fullYear = currentIndianDate.getFullYear();
-    const datetime = `${date}-${month}-${fullYear} (${config.from}`;
-    const fileName = `${config.duty.trim()} Darbar Sahib ${getKirtanType(config.from, config.to) || "Kirtan Duty "}${datetime} - ${config.to})`;
-    
-    if (fs.existsSync(`./${fileName}.mov`)) {
-      return;
-    }
     let endMilliseconds;
     if (config.to.trim().toLowerCase() === "till completion")
       endMilliseconds = 1000 * 60 * 90;
     else
       endMilliseconds =
         (parseInt(config.to.split("-")[0]) -
-          parseInt(currentIndianDate?.getHours()) +
+          parseInt(config.from.split("-")[0]) +
           (parseInt(config.to.split("-")[1]) -
-            parseInt(currentIndianDate?.getMinutes())) /
-            60) *
+            parseInt(config.from.split("-")[1])) /
+          60) *
         60 *
         60 *
         1000;
