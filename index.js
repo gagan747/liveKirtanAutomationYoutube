@@ -75,7 +75,7 @@ const recordStream = async (duty, endMilliseconds, to, from) => {
     .inputOptions(["-ignore_loop", "0"]) // if want a img instead of gif replace this inputOPtions with loop()
     .input(liveGurbaniStream) //it goes to event loop and when the on('data') event fires it converts to video and writes to output path and the process continues until we manually stop input stream
     .audioFilters([
-      "aecho=0.8:0.9:90|180:0.3|0.25",    // reduced delay times for quicker echo
+      "aecho=0.8:0.9:20|70:0.3|0.25",    // reduced delay times for quicker echo
       "highpass=f=200",                     // keep the high pass filter
       "lowpass=f=3000",                     // keep the low pass filter
       "volume=2dB"                          // keep the volume adjustment
