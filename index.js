@@ -68,7 +68,7 @@ const recordStream = async (duty, endMilliseconds, to, from) => {
   const command = ffmpeg();
   command
     .input(
-      getIndianDate().getHours() >= 19 || getIndianDate().getHours() <= 5
+      getIndianDate().getHours() >= 18 || getIndianDate().getHours() <= 5
         ? imgNigPath
         : imgMorPath,
     )
